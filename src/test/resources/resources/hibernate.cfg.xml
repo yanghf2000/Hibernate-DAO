@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+				<!-- 已过期 -->
+<!--    	<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>-->
+    	<property name="hibernate.dialect.storage_engine">innodb</property>
+
+    	<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    	<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate_test?useSSL=false</property>
+    	<property name="hibernate.connection.username">root</property>
+    	<property name="hibernate.connection.password">123456</property>
+    	
+    	<property name="show_sql">true</property>
+    	<property name="format_sql">true</property>
+    	
+    	<property name="hbm2ddl.auto">update</property>
+    	<property name="hibernate.autoReconnect">true</property>
+    	
+    	<property name="hibernate.max_fetch_depth">3</property>
+    	
+  	    		<!-- 对于关键字，自动加引号 -->
+    	<property name="hibernate.auto_quote_keyword">true</property>
+    	
+    		<!-- hibernate搜索 -->
+    	<property name="hibernate.search.default.directory_provider">filesystem</property>
+		<property name="hibernate.search.default.indexBase" >d://data//hibernate-index</property>
+
+    </session-factory>
+</hibernate-configuration>

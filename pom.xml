@@ -1,0 +1,125 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.yanghf2000</groupId>
+  <artifactId>hibernatedao</artifactId>
+  <version>0.0.2-release</version>
+  
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <skipTests>true</skipTests>
+        <hibenate.version>5.4.0.Final</hibenate.version>
+        <hibenate.search.version>5.11.0.Final</hibenate.search.version>
+        <lombok.version>1.18.4</lombok.version>
+    </properties>
+  
+  <build>
+        <finalName>dao</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-javadoc-plugin</artifactId>
+		        <version>3.0.0</version>
+	      </plugin>
+	
+				<!-- 跳过测试，如果在打包时想测试，追加参数 -DskipTests=false  -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <skipTests>${skipTests}</skipTests>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build> 
+        
+  <dependencies>
+  
+	  		<!-- https://mvnrepository.com/artifact/junit/junit -->
+	<dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <version>4.12</version>
+	    <scope>test</scope>
+	</dependency>
+	
+			<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+	<dependency>
+	    <groupId>org.hibernate</groupId>
+	    <artifactId>hibernate-core</artifactId>
+	    <version>${hibenate.version}</version> 
+	</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api -->
+	<dependency>
+	    <groupId>org.hibernate.javax.persistence</groupId>
+	    <artifactId>hibernate-jpa-2.1-api</artifactId>
+	    <version>1.0.0.Final</version>
+	</dependency>
+	
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+	<dependency>
+	    <groupId>org.projectlombok</groupId>
+	    <artifactId>lombok</artifactId>
+	    <version>${lombok.version}</version>
+	</dependency>
+
+	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java 
+		用mysql8.0, 连接用5.1.45正好，用5.1.39或8.0.11都会报错
+	-->
+	<dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>5.1.45</version>
+	    <scope>runtime</scope>
+	</dependency>
+		
+	 <dependency>
+           <groupId>com.mchange</groupId>
+           <artifactId>c3p0</artifactId>
+           <version>0.9.5.1</version>
+		    <scope>runtime</scope>
+       </dependency>
+       
+		       <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-search -->
+		<dependency>
+		    <groupId>org.hibernate</groupId>
+		    <artifactId>hibernate-search</artifactId>
+		    <version>${hibenate.search.version}</version>
+		</dependency>
+		
+		        <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-smartcn -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <version>5.5.5</version>
+        </dependency>
+  	
+  </dependencies>
+  
+</project>
