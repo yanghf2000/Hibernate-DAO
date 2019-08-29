@@ -1,16 +1,9 @@
 package com.github.yanghf2000.dao;
 
-import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.util.*;
-import java.util.Map.Entry;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-
+import com.github.yanghf2000.queryobject.QueryDeleteObject;
+import com.github.yanghf2000.queryobject.QueryObject;
+import com.github.yanghf2000.queryobject.QuerySearchObject;
+import com.github.yanghf2000.queryobject.QueryUpdateObject;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,10 +13,11 @@ import org.hibernate.query.Query;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 
-import com.github.yanghf2000.queryobject.QueryDeleteObject;
-import com.github.yanghf2000.queryobject.QueryObject;
-import com.github.yanghf2000.queryobject.QuerySearchObject;
-import com.github.yanghf2000.queryobject.QueryUpdateObject;
+import javax.persistence.criteria.*;
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -33,7 +27,7 @@ import com.github.yanghf2000.queryobject.QueryUpdateObject;
  */
 public abstract class Dao<T> {
 	
-	public final static int TIME_OUT = 15_000;
+	public final static int TIME_OUT = 30_000;
 
     protected Class<T> clazz;
 
@@ -42,7 +36,7 @@ public abstract class Dao<T> {
         ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();
         clazz = (Class<T>) type.getActualTypeArguments()[0];
     }
-    
+
     protected abstract SessionFactory getSessionFactory();
     
     protected Session getSession() {
