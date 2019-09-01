@@ -123,7 +123,7 @@ public abstract class Dao<T> {
 	 * 对于持久化对象，查出来后再merge，新对象只是原持久化对象的复制，hash值都是一样的<br>
 	 * 对于持久化对象，查出来后evict，旧的对象不被session维护，session只维护新的对象<br>
 	 *
-	 * @param object a detached instance with state to be copied
+	 * @param t a detached instance with state to be copied
 	 * @return an updated persistent instance
 	 *
      * @param t
@@ -256,7 +256,7 @@ public abstract class Dao<T> {
 
     /**
      * 执行更新, hql语句
-     * @param sql
+     * @param hql
      * @param args	如果有in语句，如果是集合可以直接传入；如果是数组，不能直接放进来，要用new Object[]{new Object[]{1, 2, 3}}，否则会处理成单个值，造成不起作用
      */
     @SuppressWarnings({ "rawtypes", "deprecation" })
@@ -291,7 +291,7 @@ public abstract class Dao<T> {
     /**
      * 根据id获取对象， 可以加锁，对于锁为null的，则不加锁
      * @param id
-     * @param lockMode
+     * @param lockOptions
      * @return
      */
     public T get(Long id, LockOptions lockOptions) {
@@ -433,7 +433,7 @@ public abstract class Dao<T> {
      * @param hql
      * @param first
      * @param size
-     * @param objects
+     * @param params
      * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -696,7 +696,7 @@ public abstract class Dao<T> {
     
     /**
      * 取得多个值的集合，返回为数组集合，无分页, 这个返回的是数组的集合
-     * @param fields要查询的字段
+     * @param fields 要查询的字段
      * @return {@link List}
      */
     public List<Object[]> list(String... fields) {
@@ -711,12 +711,11 @@ public abstract class Dao<T> {
      * @return {@link List}
      */
     public List<Object[]> list(Integer pageNo, Integer size, String... fields) {
-    	return getQueryObject().list(pageNo, size, fields);
+    	return getQueryObject().list(pageNo, size, Objects.requireNonNull(fields));
     }
     
 	/**
 	 * 根据某个字段进行统计
-	 * @param field 要统计的字段
 	 * @param distinct 是否去重
 	 * @return {@link Number}
 	 */
@@ -804,7 +803,7 @@ public abstract class Dao<T> {
     /**
      * 搜索
      * @param key					要查找的关键字
-     * @param isAsc				是否升序
+     * @param asc				是否升序
      * @param orderField			排序字段
      * @param pageNo			第几页，从0开始
      * @param pageSize			每页数量
