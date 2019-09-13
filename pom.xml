@@ -8,9 +8,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
-        <hibenate.version>5.4.0.Final</hibenate.version>
-        <hibenate.search.version>5.11.0.Final</hibenate.search.version>
-        <lombok.version>1.18.4</lombok.version>
+        <hibenate.version>5.4.4.Final</hibenate.version>
+        <hibenate.search.version>5.11.2.Final</hibenate.search.version>
+        <apache.lucene.version>5.5.5</apache.lucene.version>
+        <mysql.version>5.1.45</mysql.version>
+        <c3p0.version>0.9.5.4</c3p0.version>
+        <hibernate.jpa.api.version>1.0.2.Final</hibernate.jpa.api.version>
+        <lombok.version>1.18.10</lombok.version>
     </properties>
   
   <build>
@@ -75,18 +79,19 @@
 	    <version>${hibenate.version}</version> 
 	</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api -->
-	<dependency>
-	    <groupId>org.hibernate.javax.persistence</groupId>
-	    <artifactId>hibernate-jpa-2.1-api</artifactId>
-	    <version>1.0.0.Final</version>
-	</dependency>
+      <!-- https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api -->
+      <dependency>
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.1-api</artifactId>
+          <version>${hibernate.jpa.api.version}</version>
+      </dependency>
 	
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 	<dependency>
 	    <groupId>org.projectlombok</groupId>
 	    <artifactId>lombok</artifactId>
 	    <version>${lombok.version}</version>
+        <scope>provided</scope>
 	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java 
@@ -95,7 +100,7 @@
 	<dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
-	    <version>5.1.45</version>
+	    <version>${mysql.version}</version>
 	    <scope>runtime</scope>
 	</dependency>
 		
@@ -103,7 +108,7 @@
       <dependency>
           <groupId>com.mchange</groupId>
           <artifactId>c3p0</artifactId>
-          <version>0.9.5.4</version>
+          <version>${c3p0.version}</version>
           <scope>runtime</scope>
       </dependency>
 
@@ -118,7 +123,7 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>5.5.5</version>
+            <version>${apache.lucene.version}</version>
         </dependency>
   	
   </dependencies>

@@ -1,18 +1,9 @@
 package com.github.yanghf2000.queryobject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import javax.persistence.LockModeType;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Fetch;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Selection;
+import javax.persistence.criteria.*;
 
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
@@ -199,7 +190,7 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
 	public QueryObject<T> leftJoin(String fieldName){
 		return join(fieldName, JOIN, JoinType.LEFT);
 	}
-	
+
 	/**
 	 * 添加联表
 	 * @param fieldName	要添加的字段
@@ -208,21 +199,72 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
 	 */
 	private QueryObject<T> join(String fieldName, String joinOrFetch, JoinType joinType){
 		String[] arr = fieldName.split(REGEXP_DOT);
-		
-		if(FETCH.equalsIgnoreCase(joinOrFetch)) {
-			Fetch fetch = root.fetch(arr[0], joinType);
-			for(int i = 1; i < arr.length; i++) {
-				fetch = fetch.fetch(arr[i], joinType);
-			}
-		}else {
-			Join join = root.join(arr[0], joinType);
-			for(int i = 1; i < arr.length; i++) {
-				join = join.join(arr[i], joinType);
-			}
+
+		switch (joinOrFetch.toLowerCase()) {
+			case FETCH:
+				Fetch fetch = getFetch(arr[0], joinType);
+				for(int i = 1; i < arr.length; i++) {
+					fetch = getFetch(arr[i], fetch, joinType);
+				}
+				break;
+			case JOIN:
+				Join join = getJoin(arr[0], joinType);
+				for(int i = 1; i < arr.length; i++) {
+					join = getJoin(arr[i], join, joinType);
+				}
+				break;
 		}
 		return this;
 	}
-	
+
+	/**
+	 * 获取根节点下的关联表
+	 * @param propName
+	 * @return
+	 */
+	private Fetch getFetch(String propName, JoinType joinType) {
+		Set<Fetch> fetches = root.getFetches();
+		Optional<Fetch> op = fetches.stream().filter(e -> e.getAttribute().getName().equalsIgnoreCase(propName)).findFirst();
+		return op.isPresent() ? op.get() : root.fetch(propName, joinType);
+	}
+
+	/**
+	 * 获取连表
+	 * @param propName
+	 * @param fetch
+	 * @param joinType
+	 * @return
+	 */
+	private Fetch getFetch(String propName, Fetch fetch, JoinType joinType) {
+		Set<Fetch> fetches = Objects.requireNonNull(fetch).getFetches();
+		Optional<Fetch> op = fetches.stream().filter(e -> e.getAttribute().getName().equalsIgnoreCase(propName)).findFirst();
+		return op.isPresent() ? op.get() : fetch.fetch(propName, joinType);
+	}
+
+	/**
+	 * 获取根节点下的关联表
+	 * @param propName
+	 * @return
+	 */
+	private Join getJoin(String propName, JoinType joinType) {
+		Set<Join> joins = root.getJoins();
+		Optional<Join> op = joins.stream().filter(e -> e.getAttribute().getName().equalsIgnoreCase(propName)).findFirst();
+		return op.isPresent() ? op.get() : root.join(propName, joinType);
+	}
+
+	/**
+	 * 获取连表
+	 * @param propName
+	 * @param join
+	 * @param joinType
+	 * @return
+	 */
+	private Join getJoin(String propName, Join join, JoinType joinType) {
+		Set<Join> joins = Objects.requireNonNull(join).getJoins();
+		Optional<Join> op = joins.stream().filter(e -> e.getAttribute().getName().equalsIgnoreCase(propName)).findFirst();
+		return op.isPresent() ? op.get() : join.join(propName, joinType);
+	}
+
 	/**
 	 * 内连接抓取, 连接只能取关联对象或关联元素<br>
 	 * <b>如果获取的结果中不含要抓取的对象，则会报错

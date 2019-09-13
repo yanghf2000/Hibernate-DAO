@@ -3,6 +3,10 @@ Hibernate通用DAO
 
 	本项目的目的是为了方便对数据库的操作，提供了一些常用的方法。
 	在test文件夹下提供了测试方法，方便进行测试。
+	
+2019-9-13
+hibernate, hibernate search都采用最新版本
+解决同时关联a.b.c  a.d时报a重复关联的问题
 
 2019-2-13
 hibernate search可以维护指定类的索引
