@@ -271,7 +271,17 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	public O andIn(String fieldName, List list){
 		return addAndCondition(builder.in(extractPath(fieldName)).value(Objects.requireNonNull(list)));
 	}
-	
+
+	/**
+	 * and in
+	 * @param fieldName 字段名
+	 * @param set 值
+	 * @return {@link AbstraceQueryObject}
+	 */
+	public O andIn(String fieldName, Set set){
+		return addAndCondition(builder.in(extractPath(fieldName)).value(Objects.requireNonNull(set)));
+	}
+
 	/**
 	 * and in
 	 * @param fieldName 字段名
