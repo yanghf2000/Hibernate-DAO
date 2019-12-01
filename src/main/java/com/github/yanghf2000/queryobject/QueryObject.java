@@ -1,14 +1,13 @@
 package com.github.yanghf2000.queryobject;
 
-import java.util.*;
-
-import javax.persistence.LockModeType;
-import javax.persistence.criteria.*;
-
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.query.criteria.internal.OrderImpl;
+
+import javax.persistence.LockModeType;
+import javax.persistence.criteria.*;
+import java.util.*;
 
 /**
  * 封装查询对象<p>
@@ -96,7 +95,7 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
 	/**
 	 * 统计CriteriaQuery
 	 * @param field: 要传入的字段，必须为表中有的字段，若不填，默认为id
-	 * @param distinct: 是否去重
+	 * @param statType: 统计类型 MAX MIN SUM COUNT
 	 * @return {@link CriteriaQuery}
 	 */
 	private CriteriaQuery<T> getStatCriteriaQuery(String field, String statType){
@@ -137,7 +136,7 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
 
 		return this.criteria;
 	}
-	
+
 	// ********************************** 以下为添加条件 ********************************
 	
 	/**

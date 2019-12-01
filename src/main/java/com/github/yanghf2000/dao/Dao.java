@@ -40,8 +40,17 @@ public abstract class Dao<T> {
     protected abstract SessionFactory getSessionFactory();
     
     protected Session getSession() {
+        return getSession(null);
+    }
+
+    /**
+     *
+     * @param timeout 查询超时时间，单位：秒
+     * @return
+     */
+    protected Session getSession(Integer timeout) {
         Session currentSession = getSessionFactory().getCurrentSession();
-        currentSession.setProperty("javax.persistence.query.timeout", TIME_OUT);
+        currentSession.setProperty("javax.persistence.query.timeout", timeout != null ? timeout : TIME_OUT);
         currentSession.setProperty("hibernate.order_updates", true);
         currentSession.setProperty("hibernate.order_inserts", true);
         return currentSession;
@@ -565,7 +574,16 @@ public abstract class Dao<T> {
     public QueryObject<T> getQueryObject() {
         return QueryObject.getInstance(getSession(), clazz);
     }
-    
+
+    /**
+     * 取得一个查询对象
+     * @param timeout 超时时间，单位：秒
+     * @return {@link QueryObject}
+     */
+    public QueryObject<T> getQueryObject(Integer timeout) {
+        return QueryObject.getInstance(getSession(timeout), clazz);
+    }
+
     /**
      * 取得一个更新对象
      * @return {@link QueryUpdateObject}
@@ -589,7 +607,16 @@ public abstract class Dao<T> {
     public QuerySearchObject<T> getQuerySearchObject() {
     	return QuerySearchObject.getInstance(getSession(), clazz);
     }
-    
+
+    /**
+     * 取得一个search查询对象
+     * @param timeout 超时时间，单位：秒
+     * @return {@link QueryObject}
+     */
+    public QuerySearchObject<T> getQuerySearchObject(Integer timeout) {
+    	return QuerySearchObject.getInstance(getSession(timeout), clazz);
+    }
+
     /**
      * 设置分页参数
      * @param query	{@link Query}
