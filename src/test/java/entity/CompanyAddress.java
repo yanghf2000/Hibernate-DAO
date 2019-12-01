@@ -1,13 +1,9 @@
 package entity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -25,5 +21,7 @@ public class CompanyAddress extends BaseEntity {
 	@MapsId
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Address address;
+
+
 
 }

@@ -1,45 +1,25 @@
 package entity;
 
+import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
+import com.github.yanghf2000.bridge.DateTimeFieldBridge;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.search.annotations.*;
+import org.hibernate.search.spatial.Coordinates;
+import vo.UserVo;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import javax.persistence.*;
-import javax.tools.DocumentationTool.Location;
-
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.hibernate.annotations.CollectionType;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.IndexColumn;
-import org.hibernate.annotations.Type;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.ContainedIn;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Latitude;
-import org.hibernate.search.annotations.Longitude;
-import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.annotations.SpatialMode;
-import org.hibernate.search.annotations.Store;
-import org.hibernate.search.spatial.Coordinates;
-
-import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
-import com.github.yanghf2000.bridge.DateTimeFieldBridge;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import vo.UserVo;
 
 // 这个注解要加在entity类中，否则会找不到
 @SqlResultSetMapping(name = "user_dto", classes = @ConstructorResult(targetClass = UserVo.class, columns = {
@@ -110,6 +90,9 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@ContainedIn
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<Address> addresses;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+	private List<Company> companies;
 
 	// 纬度
 	@Latitude

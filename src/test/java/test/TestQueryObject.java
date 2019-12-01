@@ -1,28 +1,24 @@
 package test;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.LockModeType;
-
-import entity.*;
-import org.hibernate.LockMode;
-import org.hibernate.LockOptions;
+import dao.AddressDao;
+import dao.CompanyDao;
+import dao.UserDao;
+import entity.Address;
+import entity.Company;
+import entity.Sex;
+import entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import dao.AddressDao;
-import dao.CompanyDao;
-import dao.UserDao;
 import util.SessionFactoryUtils;
+
+import javax.persistence.LockModeType;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 public class TestQueryObject {
 	
@@ -269,6 +265,20 @@ public class TestQueryObject {
 	
 	@Test
 	public void testInnerJoin() {
+
+		// ************************** 报错 *************************
+		// 下面的语句无论哪种形式都会报错
+		// Caused by: org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags:
+		// [entity.User.companies, entity.Company.addresses]
+		// 不能多次获取集合，如果把adresses改为address则没事
+		String hql = "select u from User u left join fetch u.companies c left join fetch c.addresses where u.id = ?0";
+		List<User> users = userDao.findByHQL(hql, 1L);
+		System.out.println(users.size());
+
+		User user = userDao.getQueryObject().leftJoinFetch("companies.addresses").andEqual("id", 1).getOne();
+		System.out.println(user);
+		// **************************************
+
 		// 不加fetch的，对于address中的user，需要再发一次sql
 		List<Address> list = addressDao.getQueryObject()./*innerJoin("user").*/andEqual("user", new User(5L)).list();
 		list.forEach(a -> System.out.println(a.getUser()));
