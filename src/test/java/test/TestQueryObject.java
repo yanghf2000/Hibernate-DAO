@@ -2,11 +2,9 @@ package test;
 
 import dao.AddressDao;
 import dao.CompanyDao;
+import dao.ProductDao;
 import dao.UserDao;
-import entity.Address;
-import entity.Company;
-import entity.Sex;
-import entity.User;
+import entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -27,7 +25,8 @@ public class TestQueryObject {
 	private UserDao userDao = new UserDao();
 	private AddressDao addressDao = new AddressDao();
 	private CompanyDao companyDao = new CompanyDao();
-	
+	private ProductDao productDao = new ProductDao();
+
 	private Session ss;
 	private Transaction tx;
 	
@@ -58,6 +57,19 @@ public class TestQueryObject {
 		
 		if(ss != null && ss.isOpen())
 			ss.close();
+	}
+
+	@Test
+	public void testMap() {
+		Product product = productDao.getQueryObject().innerJoinFetch("productArguments").andEqual("id", 1L).getOne();
+		System.out.println(product);
+
+		if(product != null) {
+			System.out.println(product.getProductArguments());
+//			product.getProductArguments().put("stopTick", new ProductArguments(1, 100, 2));
+//			System.out.println(product.getProductArguments());
+		}
+
 	}
 	
 	@Test

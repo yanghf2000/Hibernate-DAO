@@ -1,37 +1,21 @@
 package entity;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.DateBridge;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Norms;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
-
 import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Parameter;
+import org.hibernate.search.annotations.*;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -84,4 +68,12 @@ public class Product extends BaseIdEntity {
 	@IndexedEmbedded(includeEmbeddedObjectId = true, depth = 2, includePaths = {"id", "name", "user.id"})
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Company company;
+
+	// key name，这个不需要在value里映射
+	// 这一种不会生成带主键的表，不过也可以用join获取
+	@ElementCollection
+	@CollectionTable(name = "product_arguments")
+	@MapKeyColumn(name = "name", length = 100)
+	private Map<String, ProductArguments> productArguments = new HashMap<>();
+
 }
