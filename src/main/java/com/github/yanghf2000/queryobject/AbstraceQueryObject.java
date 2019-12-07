@@ -1,16 +1,10 @@
 package com.github.yanghf2000.queryobject;
 
-import java.util.*;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Fetch;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+
+import javax.persistence.criteria.*;
+import java.util.*;
 
 
 /**
@@ -351,11 +345,14 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 			// 如果是查询id时，有些时候可以不用关联表，要走以下方法，关联表时不会写有id，这个应该不冲突
 			// 加上这个后，以下语句有问题 Address address = addressDao.getQueryObject()./*innerJoin("user.addresses").*/andEqual("user.addresses.id", 1).getOne();
 			if("id".equals(arr[arr.length - 1])) {
-				Path p = root.get(arr[0]);
-				for(int i = 1; i < arr.length; i++) {
-					p = p.get(arr[i]);
+				// 对于a.id这种，直接返回，否则还是进行关联
+				if(arr.length <= 2) {
+					Path p = root.get(arr[0]);
+					for(int i = 1; i < arr.length; i++) {
+						p = p.get(arr[i]);
+					}
+					return p;
 				}
-				return p;
 			}
 			
 			// 先检查fetch
