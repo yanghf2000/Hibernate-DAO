@@ -351,7 +351,7 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
      * @param size 要查询的数量, 若size为null, 则pageNo变为起始化
      * @return {@link List}
      */
-    public <E>List<E> list(Integer pageNo, Integer size) {
+    public <E>List<E> list(int pageNo, Integer size) {
     	return list(this.getCriteriaQuery(), pageNo, size);
     }
 
@@ -371,7 +371,7 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
      * @param size 要查询的数量
      * @return {@link List}
      */
-    public <E>List<E> list(String field, Integer pageNo, Integer size) {
+    public <E>List<E> list(String field, int pageNo, Integer size) {
     	return list(this.getSingleFieldCriteriaQuery(field), pageNo, size);
     }
     
@@ -391,7 +391,7 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
      * @param fields 要查询的字段
      * @return {@link List}
      */
-    public List<Object[]> list(Integer pageNo, Integer size, String... fields) {
+    public List<Object[]> list(int pageNo, Integer size, String... fields) {
     	return list(this.getAnyFieldsCriteriaQuery(fields), pageNo, size);
     }
     
