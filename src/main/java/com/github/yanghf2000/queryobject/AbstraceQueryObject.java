@@ -456,12 +456,11 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
      * @param size
      */
     protected void addPage(Query query, Integer pageNo, Integer size){
-		Objects.requireNonNull(pageNo);
-    	if(size == null) {
-    		query.setFirstResult(pageNo);
-    		return;
-		}
-		query.setFirstResult(getStart(pageNo, size)).setMaxResults(size);
+    	if(pageNo != null)
+			query.setFirstResult(size == null ? pageNo : getStart(pageNo, size));
+
+    	if(size != null)
+    		query.setMaxResults(size);
     }
     
 }
