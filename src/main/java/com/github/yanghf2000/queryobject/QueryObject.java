@@ -348,13 +348,13 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
     /**
      * 取得一个集合，有分页
      * @param pageNo 起始页号, 从0开始
-     * @param size 要查询的数量
+     * @param size 要查询的数量, 若size为null, 则pageNo变为起始化
      * @return {@link List}
      */
     public <E>List<E> list(Integer pageNo, Integer size) {
     	return list(this.getCriteriaQuery(), pageNo, size);
     }
-    
+
     /**
      * 取得单个值的集合，无分页
      * @param field 要查询的字段

@@ -452,12 +452,16 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
     /**
      * 添加分页
      * @param query
-     * @param pageNo
+     * @param pageNo not null, 若只有pageNo，没有size时，pageNo作为开始行
      * @param size
      */
     protected void addPage(Query query, Integer pageNo, Integer size){
-    	if (pageNo != null && size != null)
-            query.setFirstResult(getStart(pageNo, size)).setMaxResults(size);
+		Objects.requireNonNull(pageNo);
+    	if(size == null) {
+    		query.setFirstResult(pageNo);
+    		return;
+		}
+		query.setFirstResult(getStart(pageNo, size)).setMaxResults(size);
     }
     
 }
