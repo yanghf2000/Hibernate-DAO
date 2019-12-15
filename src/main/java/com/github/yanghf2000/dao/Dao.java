@@ -58,11 +58,12 @@ public abstract class Dao<T> {
 
     /**
      * 调用该方法必须要关闭session
+     * @param timeoutMillis 超时时间，单位：毫秒
      * @return
      */
-    protected Session getNewSession() {
+    public Session getNewSession(Integer timeoutMillis) {
         Session openSession = getSessionFactory().openSession();
-        openSession.setProperty("javax.persistence.query.timeout", TIME_OUT);
+        openSession.setProperty("javax.persistence.query.timeout", timeoutMillis != null ? timeoutMillis : TIME_OUT);
         return openSession;
     }
 
@@ -509,6 +510,17 @@ public abstract class Dao<T> {
 
     /**
      * 用原生sql获取集合查询，带分页，加映射对象类型
+     * @param session		可以使用自定义session
+     * @param sql			要执行的sql
+     * @param objects		参数
+     * @return
+     */
+	public <E> List<E> findBySql(Session session, String sql, Object... objects) {
+        return findBySqlWithLimit(session, null, sql, null, null, objects);
+    }
+
+    /**
+     * 用原生sql获取集合查询，带分页，加映射对象类型
      * @param objectClass		查询结果类
      * @param sql			要执行的sql
      * @param objects		参数
@@ -529,15 +541,31 @@ public abstract class Dao<T> {
 	 */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <E> List<E> findBySqlWithLimit(Class objectClass, String sql, Integer first, Integer size, Object... objects) {
-    	Query query = objectClass == null ? getSession().createNativeQuery(sql) : getSession().createNativeQuery(sql, objectClass);
-    	
+    	return findBySqlWithLimit(null, objectClass, sql, first, size, objects);
+    }
+
+	/**
+	 * 用原生sql获取集合查询，带分页，加映射对象类型
+	 * @param session		可以使用自定义session
+	 * @param objectClass		查询结果类
+	 * @param sql			要执行的sql
+	 * @param first			查询起始位置
+	 * @param size			要查询的数量
+	 * @param objects		参数
+	 * @return
+	 */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public <E> List<E> findBySqlWithLimit(Session session, Class objectClass, String sql, Integer first, Integer size, Object... objects) {
+        Session s = session == null ? getSession() : session;
+    	Query query = objectClass == null ? s.createNativeQuery(sql) : s.createNativeQuery(sql, objectClass);
+
     	if (objects != null && objects.length > 0) {
-    		for (int i = 0; i < objects.length; i++) 
+    		for (int i = 0; i < objects.length; i++)
     			query.setParameter(i + 1, objects[i]);
     	}
-    	
+
     	setLimitProperty(query, first, size);
-    	
+
     	return query.getResultList();
     }
 
