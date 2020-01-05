@@ -377,8 +377,12 @@ public abstract class Dao<T> {
         Query query = getSession().createQuery(hql);
 
         if (objects != null && objects.length > 0) {
-            for (int i = 0; i < objects.length; i++) 
-                query.setParameter(i, objects[i]);
+            for (int i = 0; i < objects.length; i++) {
+                if(objects[i] instanceof Collection)
+                    query.setParameterList(i, (Collection)objects[i]);
+                else
+                    query.setParameter(i, objects[i]);
+            }
         }
 
         return (E) query.uniqueResult();
@@ -425,8 +429,8 @@ public abstract class Dao<T> {
     	
     	if (objects != null && objects.length > 0) {
     		for (int i = 0; i < objects.length; i++) {
-    			if(objects[i] instanceof List)
-    				query.setParameterList(i, (List)objects[i]);
+    			if(objects[i] instanceof Collection)
+    				query.setParameterList(i, (Collection)objects[i]);
     			else 
     				query.setParameter(i, objects[i]);
     				
