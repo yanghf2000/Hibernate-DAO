@@ -256,12 +256,31 @@ public abstract class Dao<T> {
     @SuppressWarnings("rawtypes")
 	public int updateBySql(String sql, Object... args) {
         Query query = getSession().createNativeQuery(sql);
-        if (args != null && args.length > 0) 
-            // native的方法是从1开始
-            for (int i = 0; i < args.length; i++) 
-                query = query.setParameter(i + 1, args[i]);
-
+        addParameters(query, true, args);
         return query.executeUpdate();
+    }
+
+    /**
+     * 为query添加参数
+     * @param query
+     * @param isNativeQuery
+     * @param args
+     */
+    private void addParameters(Query query, boolean isNativeQuery, Object... args) {
+        if (args != null && args.length > 0) {
+            int offset = isNativeQuery ? 1 : 0;
+            for (int i = 0; i < args.length; i++) {
+                Object value = args[i];
+                if (value instanceof Collection) {
+                    // native的方法是从1开始
+                    query.setParameterList(i + offset, (Collection) value);
+                } else if (value instanceof Object[]) {
+                    query.setParameterList(i + offset, (Object[]) value);
+                } else {
+                    query = query.setParameter(i + offset, value);
+                }
+            }
+        }
     }
 
     /**
@@ -272,18 +291,7 @@ public abstract class Dao<T> {
     @SuppressWarnings({ "rawtypes", "deprecation" })
 	public int updateByHql(String hql, Object... args) {
         Query query = getSession().createQuery(hql);
-        if (args != null && args.length > 0)
-            for (int i = 0; i < args.length; i++) {
-            	Object value = args[i];
-            	if(value instanceof List) {
-            		query.setParameterList(i, (Collection) value);
-            	}else if(value instanceof Object[]) {
-            		 query.setParameterList(i, (Object[]) value);
-            	} else {
-            		query = query.setParameter(i, value);
-            	}
-            }
-        
+        addParameters(query, false, args);
         return query.executeUpdate();
     }
     
@@ -338,12 +346,7 @@ public abstract class Dao<T> {
     @SuppressWarnings({"unchecked", "rawtypes" })
     public <E> E findSingleValueBySql(Class objectClass, String sql, Object... objects) {
         Query<E> query = objectClass == null ? getSession().createNativeQuery(sql) : getSession().createNativeQuery(sql, objectClass);
-
-        if (objects != null && objects.length > 0) {
-            for (int i = 0; i < objects.length; i++) 
-                query.setParameter(i + 1, objects[i]);
-        }
-
+        addParameters(query, true, objects);
         return query.uniqueResult();
     }
     
@@ -375,16 +378,7 @@ public abstract class Dao<T> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	public <E> E findSingleValueByHql(String hql, Object... objects) {
         Query query = getSession().createQuery(hql);
-
-        if (objects != null && objects.length > 0) {
-            for (int i = 0; i < objects.length; i++) {
-                if(objects[i] instanceof Collection)
-                    query.setParameterList(i, (Collection)objects[i]);
-                else
-                    query.setParameter(i, objects[i]);
-            }
-        }
-
+        addParameters(query, false, objects);
         return (E) query.uniqueResult();
     }
 
@@ -426,17 +420,8 @@ public abstract class Dao<T> {
     	
     	if (lockOptions != null)
     		query.setLockOptions(lockOptions);
-    	
-    	if (objects != null && objects.length > 0) {
-    		for (int i = 0; i < objects.length; i++) {
-    			if(objects[i] instanceof Collection)
-    				query.setParameterList(i, (Collection)objects[i]);
-    			else 
-    				query.setParameter(i, objects[i]);
-    				
-    		}
-    	}
-    	
+
+        addParameters(query, false, objects);
     	setLimitProperty(query, first, size);
     	
     	return query.getResultList();
@@ -455,8 +440,8 @@ public abstract class Dao<T> {
         Query query = getSession().createQuery(hql);
         
         params.forEach((k, v) -> {
-        	if (v instanceof List) 
-                query.setParameterList(k, (List) v);
+        	if (v instanceof Collection)
+                query.setParameterList(k, (Collection) v);
              else 
                 query.setParameter(k, v);
         });
@@ -562,12 +547,7 @@ public abstract class Dao<T> {
     public <E> List<E> findBySqlWithLimit(Session session, Class objectClass, String sql, Integer first, Integer size, Object... objects) {
         Session s = session == null ? getSession() : session;
     	Query query = objectClass == null ? s.createNativeQuery(sql) : s.createNativeQuery(sql, objectClass);
-
-    	if (objects != null && objects.length > 0) {
-    		for (int i = 0; i < objects.length; i++)
-    			query.setParameter(i + 1, objects[i]);
-    	}
-
+        addParameters(query, true, objects);
     	setLimitProperty(query, first, size);
 
     	return query.getResultList();
@@ -586,10 +566,7 @@ public abstract class Dao<T> {
 	public <E> List<E> findBySqlUseResultMapping(String resultSetMapping, String sql, Integer first, Integer size, Object... objects) {
         NativeQuery query = getSession().createNativeQuery(sql);
 
-        if (objects != null && objects.length > 0) {
-            for (int i = 0; i < objects.length; i++) 
-                query.setParameter(i + 1, objects[i]);
-        }
+        addParameters(query, true, objects);
 
         if (resultSetMapping != null && !"".equals(resultSetMapping.trim()))
             query.setResultSetMapping(resultSetMapping);
