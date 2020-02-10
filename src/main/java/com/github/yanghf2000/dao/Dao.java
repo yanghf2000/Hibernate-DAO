@@ -600,7 +600,16 @@ public abstract class Dao<T> {
     public QueryUpdateObject<T> getUpdateObject() {
     	return QueryUpdateObject.getInstance(getSession(), clazz);
     }
-    
+
+    /**
+     * 取得一个更新对象
+     * @param timeout 查询超时时间，单位：秒
+     * @return {@link QueryUpdateObject}
+     */
+    public QueryUpdateObject<T> getUpdateObject(int timeout) {
+    	return QueryUpdateObject.getInstance(getSession(timeout), clazz);
+    }
+
     /**
      * 取得一个删除对象
      * @return {@link QueryDeleteObject}
