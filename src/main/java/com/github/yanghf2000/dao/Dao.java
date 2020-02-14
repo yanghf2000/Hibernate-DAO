@@ -935,6 +935,40 @@ public abstract class Dao<T> {
     }
 
     /**
+     * 批量维护索引
+     * @param ids
+     */
+    public void batchIndex(Serializable... ids) {
+        if(ids == null || ids.length < 1)
+            return;
+
+        for(int i = 0, qty = 1000; ; i++) {
+            List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
+            if(objs == null || objs.isEmpty())
+                break;
+
+            objs.forEach(e -> index(e));
+        }
+    }
+
+    /**
+     * 批量维护索引
+     * @param ids
+     */
+    public void batchIndex(Collection<? extends Serializable> ids) {
+        if(ids == null || ids.isEmpty())
+            return;
+
+        for(int i = 0, qty = 1000; ; i++) {
+            List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
+            if(objs == null || objs.isEmpty())
+                break;
+
+            objs.forEach(e -> index(e));
+        }
+    }
+
+    /**
      * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
      * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
      * case this method behaves like {@link #purgeAll(Class)}.
@@ -955,6 +989,32 @@ public abstract class Dao<T> {
      */
     public void purge(Serializable id) {
         purge(this.clazz, Objects.requireNonNull(id));
+    }
+
+    /**
+     * 批量删除索引
+     * @param ids
+     */
+    public void batchPurge(Serializable... ids) {
+        if(ids == null || ids.length < 1)
+            return;
+
+        for (Serializable id : ids) {
+            purge(id);
+        }
+    }
+
+    /**
+     * 批量删除索引
+     * @param ids
+     */
+    public void batchPurge(List<? extends Serializable> ids) {
+        if(ids == null || ids.isEmpty())
+            return;
+
+        for (Serializable id : ids) {
+            purge(id);
+        }
     }
 
     /**
