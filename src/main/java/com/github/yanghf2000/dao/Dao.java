@@ -946,7 +946,15 @@ public abstract class Dao<T> {
      *
      */
     public void purge(Class<T> clazz, Serializable id) {
-        getFullTextSession().purge(clazz, id);
+        getFullTextSession().purge(clazz, Objects.requireNonNull(id));
+    }
+
+    /**
+     * 删除一个索引，
+     * @param id id为null时删除该类所有索引
+     */
+    public void purge(Serializable id) {
+        purge(this.clazz, Objects.requireNonNull(id));
     }
 
     /**
