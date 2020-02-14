@@ -933,5 +933,35 @@ public abstract class Dao<T> {
     public void index(T t) {
         getFullTextSession().index(t);
     }
-    
+
+    /**
+     * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
+     * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
+     * case this method behaves like {@link #purgeAll(Class)}.
+     * <p>
+     * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity will be ignored:
+     * this method forces a purge operation.
+     * @param clazz
+     * @param id
+     *
+     */
+    public void purge(Class<T> clazz, Serializable id) {
+        getFullTextSession().purge(clazz, id);
+    }
+
+    /**
+     * Remove all entities from of particular class and all its subclasses from the index.
+     * @param clazz
+     */
+    public void purgeAll(Class<T> clazz) {
+        getFullTextSession().purgeAll(clazz);
+    }
+
+    /**
+     * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
+     */
+    public void flushToIndexes() {
+        getFullTextSession().flushToIndexes();
+    }
+
 }
