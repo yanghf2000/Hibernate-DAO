@@ -74,7 +74,23 @@ public abstract class Dao<T> {
     protected StatelessSession getStatelessSession() {
         return getSessionFactory().openStatelessSession();
     }
-    
+
+    /**
+     * 获取全文本索引session
+     * @return
+     */
+    protected FullTextSession getFullTextSession(){
+        return Search.getFullTextSession(getSession());
+    }
+
+    /**
+     * 获取全文本索引session
+     * @return
+     */
+    protected FullTextSession getFullTextSession(Integer timeout){
+        return Search.getFullTextSession(getSession(timeout));
+    }
+
     /**
      * flush
      */
@@ -903,8 +919,19 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public void maintainIndex(Class... types) throws InterruptedException {
-    	FullTextSession fullTextSession = Search.getFullTextSession(getSession());
-    	fullTextSession.createIndexer(Objects.requireNonNull(types)).startAndWait();
+    	getFullTextSession().createIndexer(Objects.requireNonNull(types)).startAndWait();
+    }
+
+    /**
+     * Force the (re)indexing of a given <b>managed</b> object.
+     * Indexation is batched per transaction: if a transaction is active, the operation
+     * will not affect the index at least until commit.
+     * <p>
+     * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity will be ignored:
+     * this method forces an index operation.
+     */
+    public void index(T t) {
+        getFullTextSession().index(t);
     }
     
 }
