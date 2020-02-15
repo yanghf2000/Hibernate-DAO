@@ -1008,7 +1008,7 @@ public abstract class Dao<T> {
      * 批量删除索引
      * @param ids
      */
-    public void batchPurge(List<? extends Serializable> ids) {
+    public void batchPurge(Collection<? extends Serializable> ids) {
         if(ids == null || ids.isEmpty())
             return;
 
