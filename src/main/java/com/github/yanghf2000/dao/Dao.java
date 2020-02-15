@@ -278,7 +278,7 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public int updateBySql(String sql, Object... args) {
-       return updateBySql(sql, TIME_OUT, args);
+       return updateBySql(TIME_OUT, sql, args);
     }
 
     /**
