@@ -278,19 +278,7 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public int updateBySql(String sql, Object... args) {
-       return updateBySql(TIME_OUT, sql, args);
-    }
-
-    /**
-     * 用原生sql执行更新
-     * @param timeout 单位: 毫秒
-     * @param sql
-     * @param args
-     * @return 返回执行成功的行数
-     */
-    @SuppressWarnings("rawtypes")
-	public int updateBySql(int timeout, String sql, Object... args) {
-        Query query = getSession(timeout).createNativeQuery(sql);
+        Query query = getSession().createNativeQuery(sql);
         addParameters(query, true, args);
         return query.executeUpdate();
     }
