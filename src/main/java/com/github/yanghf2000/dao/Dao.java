@@ -26,7 +26,10 @@ import java.util.Map.Entry;
  * @param <T> 要获取的数据类型，必须是持久化类
  */
 public abstract class Dao<T> {
-	
+
+    /**
+     * 默认超时时间，单位：毫秒
+     */
 	public final static int TIME_OUT = 30_000;
 
     protected Class<T> clazz;
@@ -38,14 +41,18 @@ public abstract class Dao<T> {
     }
 
     protected abstract SessionFactory getSessionFactory();
-    
+
+    /**
+     * 获取session
+     * @return
+     */
     protected Session getSession() {
         return getSession(null);
     }
 
     /**
-     *
-     * @param timeout 查询超时时间，单位：秒
+     * 获取session
+     * @param timeout 查询超时时间，单位：毫秒
      * @return
      */
     protected Session getSession(Integer timeout) {
@@ -271,7 +278,19 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public int updateBySql(String sql, Object... args) {
-        Query query = getSession().createNativeQuery(sql);
+       return updateBySql(sql, TIME_OUT, args);
+    }
+
+    /**
+     * 用原生sql执行更新
+     * @param sql
+     * @param timeout 单位: 毫秒
+     * @param args
+     * @return 返回执行成功的行数
+     */
+    @SuppressWarnings("rawtypes")
+	public int updateBySql(String sql, int timeout, Object... args) {
+        Query query = getSession(timeout).createNativeQuery(sql);
         addParameters(query, true, args);
         return query.executeUpdate();
     }
