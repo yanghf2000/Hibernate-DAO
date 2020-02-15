@@ -283,13 +283,13 @@ public abstract class Dao<T> {
 
     /**
      * 用原生sql执行更新
-     * @param sql
      * @param timeout 单位: 毫秒
+     * @param sql
      * @param args
      * @return 返回执行成功的行数
      */
     @SuppressWarnings("rawtypes")
-	public int updateBySql(String sql, int timeout, Object... args) {
+	public int updateBySql(int timeout, String sql, Object... args) {
         Query query = getSession(timeout).createNativeQuery(sql);
         addParameters(query, true, args);
         return query.executeUpdate();
