@@ -14,6 +14,7 @@ import org.hibernate.search.spatial.Coordinates;
 import vo.UserVo;
 
 import javax.persistence.*;
+import javax.persistence.Index;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -146,7 +147,8 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@Field
 	@IndexedEmbedded
 	@Column( name = "sex", columnDefinition = "varchar(10) NOT NULL")
-	@PrimaryKeyJoinColumn(columnDefinition = "primary key (user_id, sex)")
+	@JoinTable(name = "user_sexes", joinColumns = {@JoinColumn(name = "user_id")},
+			indexes = {@Index(name = "idx_user_id", columnList = "user_id")})
 	@Enumerated(EnumType.STRING)
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Set<Sex> sexes = new HashSet<>();
