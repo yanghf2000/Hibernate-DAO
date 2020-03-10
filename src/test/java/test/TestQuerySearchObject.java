@@ -1,10 +1,10 @@
 package test;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-
+import dao.AddressDao;
+import dao.CompanyDao;
+import dao.ProductDao;
+import dao.UserDao;
+import entity.*;
 import org.apache.lucene.search.SortField;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -12,17 +12,13 @@ import org.hibernate.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import dao.AddressDao;
-import dao.CompanyDao;
-import dao.ProductDao;
-import dao.UserDao;
-import entity.Address;
-import entity.Company;
-import entity.CompanyType;
-import entity.Product;
-import entity.User;
 import util.SessionFactoryUtils;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 
 public class TestQuerySearchObject {
 	
@@ -89,7 +85,24 @@ public class TestQuerySearchObject {
 								.match(new Object[] {CompanyType.LIMITED, CompanyType.STOCK}, "companyType")
 								.list();
 		System.out.println(list.size());
-		
+	}
+
+	@Test
+	public void testSearchCollections() {
+//		List<User> users = userDao.getQuerySearchObject().match("FEMALE MALE", "sexes").list();
+//		System.out.println(users.size());
+
+		List<User> users = userDao.getQuerySearchObject().match(Arrays.asList(Sex.FEMALE, Sex.MALE), "sexes").list();
+		System.out.println(users.size());
+
+//		List<User> users = userDao.getQuerySearchObject().match("FEMALE MALE", "sexes").list();
+//		System.out.println(users.size());
+//
+//		users = userDao.getQuerySearchObject().match("FEMALE", "sexes").list();
+//		System.out.println(users.size());
+//		// 这样也可以搜到
+//		users = userDao.getQuerySearchObject().match("male,female", "sexes").list();
+//		System.out.println(users.size());
 	}
 	
 	@Test

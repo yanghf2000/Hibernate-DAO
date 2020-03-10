@@ -142,11 +142,17 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@Transient
 	private List<String> jobs = new ArrayList<>();
 
+	// 对于以下想处理集合的，但没有独立类的，也是可以搜索的
+	@Field
+	@IndexedEmbedded
 	@Column( name = "sex", columnDefinition = "varchar(10) NOT NULL")
 	@PrimaryKeyJoinColumn(columnDefinition = "primary key (user_id, sex)")
 	@Enumerated(EnumType.STRING)
 	@ElementCollection(fetch = FetchType.EAGER)
-	private Set<Sex> materialTypes = new HashSet<>();
+	private Set<Sex> sexes = new HashSet<>();
+
+//	@Field
+//	private String sexes;
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<UserInteresting> interestings = new ArrayList<>();
