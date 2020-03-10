@@ -19,7 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // 这个注解要加在entity类中，否则会找不到
 @SqlResultSetMapping(name = "user_dto", classes = @ConstructorResult(targetClass = UserVo.class, columns = {
@@ -139,6 +141,12 @@ public class User extends BaseIdEntity implements Comparable<User>{
 //	@Type(type = "descriptor.CommaDelimitedListToStringsDescriptor")
 	@Transient
 	private List<String> jobs = new ArrayList<>();
+
+	@Column( name = "sex", columnDefinition = "varchar(10) NOT NULL")
+	@PrimaryKeyJoinColumn(columnDefinition = "primary key (user_id, sex)")
+	@Enumerated(EnumType.STRING)
+	@ElementCollection(fetch = FetchType.EAGER)
+	private Set<Sex> materialTypes = new HashSet<>();
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<UserInteresting> interestings = new ArrayList<>();
