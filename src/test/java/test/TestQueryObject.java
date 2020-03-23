@@ -274,7 +274,16 @@ public class TestQueryObject {
 															 .list();
 //		List<Company> list2 = companyDao.getQueryObject()/*.innerJoin("addresses.address.user")*//*.andEqual("addresses.address.street", "aaa")*/.list();
 	}
-	
+
+	/**
+	 * 测试关联表，但没有独立表的
+	 */
+	@Test
+	public void testElementCollection() {
+		List<User> sexes = userDao.getQueryObject().andEqual("sexes", Arrays.asList(Sex.FEMALE, Sex.MALE)).list();
+		System.out.println(sexes == null ? 0 : sexes.size());
+	}
+
 	@Test
 	public void testInnerJoin() {
 
