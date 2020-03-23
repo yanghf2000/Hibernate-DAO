@@ -280,7 +280,41 @@ public class TestQueryObject {
 	 */
 	@Test
 	public void testElementCollection() {
-		List<User> sexes = userDao.getQueryObject().andEqual("sexes", Arrays.asList(Sex.FEMALE, Sex.MALE)).list();
+
+		List<User> users = userDao.getQuerySearchObject().match(Arrays.asList(Sex.FEMALE, Sex.MALE), "sexes").list();
+		System.out.println(users.size());
+
+		/**
+		 *  select
+		 *         user0_.id as id1_0_,
+		 *         user0_.age as age2_0_,
+		 *         user0_.birthday as birthday3_0_,
+		 *         user0_.dateTime as dateTime4_0_,
+		 *         user0_.info as info5_0_,
+		 *         user0_.latitude as latitude6_0_,
+		 *         user0_.longitude as longitud7_0_,
+		 *         user0_.name as name8_0_,
+		 *         user0_.property as property9_0_,
+		 *         user0_.sex as sex10_0_,
+		 *         user0_.status as status11_0_,
+		 *         user0_.`time` as time12_0_,
+		 *         user0_.version as version13_0_
+		 *     from
+		 *         `User` user0_ cross
+		 *     join
+		 *         user_sexes sexes1_
+		 *     where
+		 *         user0_.id=sexes1_.user_id
+		 *         and (
+		 *             .=(
+		 *                 ? , ?
+		 *             )
+		 *             or 0=1
+		 *         )
+		 */
+		// 如果是这种关联表的，要加上join，否则如上面一样，无法查询
+		List<User> sexes = userDao.getQueryObject().leftJoinFetch("sexes")
+				.andIn("sexes", Arrays.asList(Sex.FEMALE, Sex.MALE)).list();
 		System.out.println(sexes == null ? 0 : sexes.size());
 	}
 
