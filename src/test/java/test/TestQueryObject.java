@@ -64,6 +64,15 @@ public class TestQueryObject {
 		Product product = productDao.getQueryObject().innerJoinFetch("productArguments").andEqual("id", 1L).getOne();
 		System.out.println(product);
 
+		Product product1 = productDao.getQueryObject().innerJoinFetch("productArguments")
+				.andEqual("id", 1L)
+				// 目前无法用key查询
+				.andEqual("productArguments.name", 1.0)
+				// 对于对象中的值，可以用这种方式获取
+//				.andEqual("productArguments.minValue", 1.0)
+				.getOne();
+		System.out.println(product1);
+
 		if(product != null) {
 			System.out.println(product.getProductArguments());
 //			product.getProductArguments().put("stopTick", new ProductArguments(1, 100, 2));
