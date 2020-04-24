@@ -104,6 +104,13 @@ public abstract class Dao<T> {
     public void flush() {
         this.getSession().flush();
     }
+    /**
+     * flush
+     */
+    public void flushAndClear() {
+        this.getSession().flush();
+        this.getSession().clear();
+    }
 
     /**
      * clear
@@ -784,13 +791,22 @@ public abstract class Dao<T> {
     
 	/**
 	 * 根据某个字段进行统计
+	 * @return {@link Number}
+	 */
+	public long count() {
+		return count(false);
+	}
+    
+
+	/**
+	 * 根据某个字段进行统计
 	 * @param distinct 是否去重
 	 * @return {@link Number}
 	 */
 	public long count(boolean distinct) {
 		return getQueryObject().count(distinct);
 	}
-    
+
     /**
      * 根据某个字段进行统计
      * @param field 要统计的字段
