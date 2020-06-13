@@ -250,6 +250,17 @@ public abstract class Dao<T> {
     }
 
     /**
+     * update
+     * @param id
+     * @param prop
+     * @param value
+     * @return
+     */
+    public int update(Serializable id, String prop, Object value) {
+        return this.getUpdateObject().set(prop, value).andEqual("id", id).update();
+    }
+
+    /**
      * 保存/更新, id为null时为保存，id不为空时为更新，但若id不为空，但不存在记录，在提交事务时会抛错：<br>
      * javax.persistence.OptimisticLockException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1<br>
      * Caused by: org.hibernate.StaleStateException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1
