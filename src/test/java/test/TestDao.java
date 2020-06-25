@@ -1,22 +1,6 @@
 package test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import org.hibernate.LockOptions;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.github.yanghf2000.dao.FieldsAndValuesMap;
-
 import dao.AddressDao;
 import dao.InterestingDao;
 import dao.ProductDao;
@@ -24,9 +8,17 @@ import dao.UserDao;
 import entity.Address;
 import entity.Interesting;
 import entity.User;
-import entity.UserInteresting;
+import org.hibernate.LockOptions;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import util.SessionFactoryUtils;
 import vo.UserVo;
+
+import java.util.*;
 
 public class TestDao {
 	
@@ -419,14 +411,14 @@ public class TestDao {
     @Test
     public void findByHQLWithLimit() {
     	String hql = "from Address a where a.id < ?";
-    	List<Address> list = addressDao.findByHQLWithLimit(hql, 1, 1, 5L);
+    	List<Address> list = addressDao.findByHQLWithLimit(hql, null, 1, 1, 5L);
     	System.out.println(list.size());
     }
     
     @Test
 	public void findByHQLWithLockLimit() {
     	String hql = "from Address a where a.id < ?";
-    	List<Address> list = addressDao.findByHQLWithLockLimit(hql, LockOptions.READ, 1, 2, 5L);
+    	List<Address> list = addressDao.findByHQLWithLockLimit(hql, null, LockOptions.READ, 1, 2, 5L);
     	System.out.println(list.size());
     }
     
@@ -514,7 +506,7 @@ public class TestDao {
 		        Address addresses1_ 
 		            on user0_.id=addresses1_.`user_id`
     	 */
-    	users = userDao.findByHQLWithLimit("select u from User u join fetch u.addresses", 0, 2);
+    	users = userDao.findByHQLWithLimit("select u from User u join fetch u.addresses", null, 0, 2);
     	System.out.println(users.size());
     	users.forEach(u -> {
     		System.out.println(u.getName() + " " + u.getAddresses().size());

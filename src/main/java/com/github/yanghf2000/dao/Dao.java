@@ -432,24 +432,37 @@ public abstract class Dao<T> {
      * @return
      */
     public <E> List<E> findByHQL(String hql, Object... objects) {
-    	return findByHQLWithLimit(hql, null, null, objects);
+    	return findByHQL(hql, null, objects);
     }
-    
+
+    /**
+     * 获取集合
+     * @param hql
+     * @param timeout
+     * @param objects  对于in参数，要传入list，不接收数组
+     * @return
+     */
+    public <E> List<E> findByHQL(String hql, Integer timeout, Object... objects) {
+    	return findByHQLWithLimit(hql, timeout, null, null, objects);
+    }
+
     /**
      * 用hql获取集合，带分页参数
      * @param hql
+     * @param timeout
      * @param first
      * @param size
      * @param objects
      * @return
      */
-    public <E> List<E> findByHQLWithLimit(String hql, Integer first, Integer size, Object... objects) {
-    	return this.findByHQLWithLockLimit(hql, null, first, size, objects);
+    public <E> List<E> findByHQLWithLimit(String hql, Integer timeout, Integer first, Integer size, Object... objects) {
+    	return this.findByHQLWithLockLimit(hql, timeout, null, first, size, objects);
     }
     
     /**
      * 查询，可选择是否加锁，分页
      * @param hql
+     * @param timeout
      * @param lockOptions
      * @param first
      * @param size
@@ -457,8 +470,9 @@ public abstract class Dao<T> {
      * @return
      */
     @SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
-	public <E> List<E> findByHQLWithLockLimit(String hql, LockOptions lockOptions, Integer first, Integer size, Object... objects) {
-    	Query query = getSession().createQuery(hql);
+	public <E> List<E> findByHQLWithLockLimit(String hql, Integer timeout,
+                          LockOptions lockOptions, Integer first, Integer size, Object... objects) {
+    	Query query = (timeout == null ? getSession() : getSession(timeout)).createQuery(hql);
     	
     	if (lockOptions != null)
     		query.setLockOptions(lockOptions);
