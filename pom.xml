@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.yanghf2000</groupId>
   <artifactId>hibernatedao</artifactId>
-  <version>0.0.2-release</version>
+  <version>1.0.0</version>
   
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
