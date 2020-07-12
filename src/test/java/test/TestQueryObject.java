@@ -99,8 +99,8 @@ public class TestQueryObject {
 		System.out.println(user);
 		
 		// 这种无法查数据
-		List<User> list = userDao.getQueryObject().andIn("jobs", jobs).list();
-		System.out.println(list.size());
+//		List<User> list = userDao.getQueryObject().andIn("jobs", jobs).list();
+//		System.out.println(list.size());
 		
 		
 /*		List<User> users = userDao.getQueryObject().andEqual("name", "aaaa").list();
