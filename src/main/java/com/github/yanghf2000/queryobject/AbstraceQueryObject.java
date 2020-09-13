@@ -60,22 +60,28 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	// ********************************** 以下为添加条件 ********************************
 	
 	/**
-	 * 等于
+	 * 等于，如果value是null，用is null
 	 * @param fieldName 字段名
 	 * @param value 值
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andEqual(String fieldName, Object value){
+		if(value == null) {
+			return isNotNull(fieldName);
+		}
 		return addAndCondition(builder.equal(extractPath(fieldName), value));
 	}
 	
 	/**
-	 * 不等于
+	 * 不等于，如果value是null，用is not null
 	 * @param fieldName 字段名
 	 * @param value 值
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andNotEqual(String fieldName, Object value){
+		if(value == null) {
+			return isNotNull(fieldName);
+		}
 		return addAndCondition(builder.notEqual(extractPath(fieldName), value));
 	}
 	
