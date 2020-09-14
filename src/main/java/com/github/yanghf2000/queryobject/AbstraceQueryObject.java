@@ -67,7 +67,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 */
 	public O andEqual(String fieldName, Object value){
 		if(value == null) {
-			return isNotNull(fieldName);
+			return isNull(fieldName);
 		}
 		return addAndCondition(builder.equal(extractPath(fieldName), value));
 	}
