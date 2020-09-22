@@ -1,29 +1,14 @@
 package entity;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import javax.persistence.*;
+import java.util.List;
 
-@Getter
-@Setter
 @Entity
 @Indexed
-@NoArgsConstructor
 public class Company extends BaseIdEntity{
 
 	private static final long serialVersionUID = 7417935378941308762L;
@@ -57,5 +42,44 @@ public class Company extends BaseIdEntity{
 	@Field
 	@Enumerated(EnumType.STRING)
 	private CompanyType companyType;
-	
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	public List<CompanyAddress> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<CompanyAddress> addresses) {
+		this.addresses = addresses;
+	}
+
+	public CompanyType getCompanyType() {
+		return companyType;
+	}
+
+	public void setCompanyType(CompanyType companyType) {
+		this.companyType = companyType;
+	}
 }

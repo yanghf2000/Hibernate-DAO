@@ -1,15 +1,8 @@
 package entity;
 
-import lombok.*;
-
 import javax.persistence.Embeddable;
 
-@Getter
-@Setter
 @Embeddable
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
 public class ProductArguments  {
 
 	private double minValue;
@@ -18,4 +11,27 @@ public class ProductArguments  {
 
 	private double step;
 
+	public double getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(double minValue) {
+		this.minValue = minValue;
+	}
+
+	public double getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(double maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public double getStep() {
+		return step;
+	}
+
+	public void setStep(double step) {
+		this.step = step;
+	}
 }

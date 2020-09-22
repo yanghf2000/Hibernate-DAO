@@ -2,13 +2,7 @@ package entity;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * 对于级联操作，若有单独的主键，则关联的对象不需要加@MapsId，否则生成的表不对<br>
@@ -16,10 +10,7 @@ import lombok.Setter;
  * @author 杨会锋
  * 2019-1-28
  */
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 public class UserInteresting extends BaseIdEntity {
 
 	private static final long serialVersionUID = -160420121215475995L;
@@ -70,5 +61,19 @@ public class UserInteresting extends BaseIdEntity {
 		return true;
 	}
 
-	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Interesting getInteresting() {
+		return interesting;
+	}
+
+	public void setInteresting(Interesting interesting) {
+		this.interesting = interesting;
+	}
 }

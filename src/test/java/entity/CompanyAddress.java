@@ -1,12 +1,7 @@
 package entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.*;
 
-@Getter
-@Setter
 @Entity
 public class CompanyAddress extends BaseEntity {
 
@@ -22,6 +17,19 @@ public class CompanyAddress extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Address address;
 
+	public Company getCompany() {
+		return company;
+	}
 
+	public void setCompany(Company company) {
+		this.company = company;
+	}
 
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 }

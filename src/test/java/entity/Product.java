@@ -1,10 +1,6 @@
 package entity;
 
 import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Parameter;
@@ -17,13 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Getter
-@Setter
 @Entity
 @Indexed
 @Analyzer(impl = SmartChineseAnalyzer.class)
-@NoArgsConstructor
-@ToString(callSuper = true)
 public class Product extends BaseIdEntity {
 
 	private static final long serialVersionUID = 3190769021252599177L;
@@ -75,5 +67,61 @@ public class Product extends BaseIdEntity {
 	@CollectionTable(name = "product_arguments")
 	@MapKeyColumn(name = "name", length = 100)
 	private Map<String, ProductArguments> productArguments = new HashMap<>();
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSubtitle() {
+		return subtitle;
+	}
+
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
+	}
+
+	public List<ProductCategory> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(List<ProductCategory> categories) {
+		this.categories = categories;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+
+	public LocalDate getPublishTime() {
+		return publishTime;
+	}
+
+	public void setPublishTime(LocalDate publishTime) {
+		this.publishTime = publishTime;
+	}
+
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
+
+	public Map<String, ProductArguments> getProductArguments() {
+		return productArguments;
+	}
+
+	public void setProductArguments(Map<String, ProductArguments> productArguments) {
+		this.productArguments = productArguments;
+	}
 
 }

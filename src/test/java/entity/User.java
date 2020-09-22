@@ -2,10 +2,6 @@ package entity;
 
 import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
 import com.github.yanghf2000.bridge.DateTimeFieldBridge;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -13,8 +9,8 @@ import org.hibernate.search.annotations.*;
 import org.hibernate.search.spatial.Coordinates;
 import vo.UserVo;
 
-import javax.persistence.*;
 import javax.persistence.Index;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,18 +26,16 @@ import java.util.Set;
 		@ColumnResult(name = "age", type = int.class) // 类似int等类型要特殊指明
 }))
 @Spatial(spatialMode = SpatialMode.HASH)
-@Getter
-@Setter
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @Indexed
 @Analyzer(impl = SmartChineseAnalyzer.class)
-@NoArgsConstructor
-@ToString(exclude = "addresses")
 public class User extends BaseIdEntity implements Comparable<User>{
 
 	private static final long serialVersionUID = 741793537894130462L;
+
+	public User(){}
 	
 	public User(Long id) {
 		this(id, null, 0);
@@ -189,5 +183,140 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	public boolean equals(Object obj) {
 		return super.equals(obj);
 	}
-	
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public Sex getSex() {
+		return sex;
+	}
+
+	public void setSex(Sex sex) {
+		this.sex = sex;
+	}
+
+	public LocalDate getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(LocalDate birthday) {
+		this.birthday = birthday;
+	}
+
+	public String getInfo() {
+		return info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
+	}
+
+	public BigDecimal getProperty() {
+		return property;
+	}
+
+	public void setProperty(BigDecimal property) {
+		this.property = property;
+	}
+
+	public List<Address> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<Address> addresses) {
+		this.addresses = addresses;
+	}
+
+	public List<Company> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(List<Company> companies) {
+		this.companies = companies;
+	}
+
+	public Double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+	public Double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
+	public LocalTime getTime() {
+		return time;
+	}
+
+	public void setTime(LocalTime time) {
+		this.time = time;
+	}
+
+	public LocalDateTime getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(LocalDateTime dateTime) {
+		this.dateTime = dateTime;
+	}
+
+	public List<String> getJobs() {
+		return jobs;
+	}
+
+	public void setJobs(List<String> jobs) {
+		this.jobs = jobs;
+	}
+
+	public Set<Sex> getSexes() {
+		return sexes;
+	}
+
+	public void setSexes(Set<Sex> sexes) {
+		this.sexes = sexes;
+	}
+
+	public List<UserInteresting> getInterestings() {
+		return interestings;
+	}
+
+	public void setInterestings(List<UserInteresting> interestings) {
+		this.interestings = interestings;
+	}
 }

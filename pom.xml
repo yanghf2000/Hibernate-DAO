@@ -14,7 +14,6 @@
         <mysql.version>8.0.20</mysql.version>
         <c3p0.version>0.9.5.5</c3p0.version>
         <hibernate-jpa-api.version>1.0.2.Final</hibernate-jpa-api.version>
-        <lombok.version>1.18.10</lombok.version>
         <junit.version>4.13</junit.version>
     </properties>
   
@@ -86,14 +85,6 @@
           <artifactId>hibernate-jpa-2.1-api</artifactId>
           <version>${hibernate-jpa-api.version}</version>
       </dependency>
-	
-		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-	<dependency>
-	    <groupId>org.projectlombok</groupId>
-	    <artifactId>lombok</artifactId>
-	    <version>${lombok.version}</version>
-        <scope>provided</scope>
-	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java 
 		用mysql8.0, 连接用5.1.45正好，用5.1.39或8.0.11都会报错
