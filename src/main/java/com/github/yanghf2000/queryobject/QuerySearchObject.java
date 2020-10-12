@@ -170,9 +170,9 @@ public class QuerySearchObject<T>{
 	}
 	
 	/**
-	 * above
-	 * @param fieldName
-	 * @param value
+	 * above，在搜索值之上，包含搜索的值
+	 * @param fieldName		字段名
+	 * @param value			值
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 * @return
 	 */
