@@ -14,7 +14,7 @@
         <mysql.version>8.0.20</mysql.version>
         <c3p0.version>0.9.5.5</c3p0.version>
         <hibernate-jpa-api.version>1.0.2.Final</hibernate-jpa-api.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
   
   <build>
