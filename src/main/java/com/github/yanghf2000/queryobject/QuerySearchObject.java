@@ -1,17 +1,6 @@
 package com.github.yanghf2000.queryobject;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
+import com.github.yanghf2000.bridge.DateTimeFieldBridge;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -22,10 +11,15 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.FieldBridge;
-import org.hibernate.search.query.dsl.*;
+import org.hibernate.search.query.dsl.BooleanJunction;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.dsl.RangeMatchingContext;
+import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.spatial.DistanceSortField;
 
-import com.github.yanghf2000.bridge.DateTimeFieldBridge;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * 封装搜索查询对象<p>
@@ -106,7 +100,6 @@ public class QuerySearchObject<T>{
 	 * @param min
 	 * @param max
 	 */
-	@Deprecated
 	public QuerySearchObject<T> range(String fieldName, Object min, Object max){
 		return range(fieldName, min, max, null);
 	}
@@ -128,7 +121,6 @@ public class QuerySearchObject<T>{
 	 * @param max
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 */
-	@Deprecated
 	public QuerySearchObject<T> range(String fieldName, Object min, Object max, Class type){
 		needJoinTable(fieldName);
 		queries.add(qb.range().onField(fieldName).from(typeConver(min, type)).to(typeConver(max, type)).createQuery());

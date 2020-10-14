@@ -14,7 +14,7 @@
         <mysql.version>8.0.20</mysql.version>
         <c3p0.version>0.9.5.5</c3p0.version>
         <hibernate-jpa-api.version>1.0.2.Final</hibernate-jpa-api.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
     </properties>
   
   <build>
@@ -64,7 +64,6 @@
         
   <dependencies>
   
-	  		<!-- https://mvnrepository.com/artifact/junit/junit -->
 	<dependency>
 	    <groupId>junit</groupId>
 	    <artifactId>junit</artifactId>
@@ -72,23 +71,18 @@
 	    <scope>test</scope>
 	</dependency>
 	
-			<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 	<dependency>
 	    <groupId>org.hibernate</groupId>
 	    <artifactId>hibernate-core</artifactId>
 	    <version>${hibernate.version}</version>
 	</dependency>
 		
-      <!-- https://mvnrepository.com/artifact/org.hibernate.javax.persistence/hibernate-jpa-2.1-api -->
       <dependency>
           <groupId>org.hibernate.javax.persistence</groupId>
           <artifactId>hibernate-jpa-2.1-api</artifactId>
           <version>${hibernate-jpa-api.version}</version>
       </dependency>
 
-	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java 
-		用mysql8.0, 连接用5.1.45正好，用5.1.39或8.0.11都会报错
-	-->
 	<dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
@@ -96,7 +90,6 @@
 	    <scope>runtime</scope>
 	</dependency>
 
-      <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
       <dependency>
           <groupId>com.mchange</groupId>
           <artifactId>c3p0</artifactId>
@@ -104,14 +97,12 @@
           <scope>runtime</scope>
       </dependency>
 
-      <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-search -->
 		<dependency>
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-search</artifactId>
 		    <version>${hibenate.search.version}</version>
 		</dependency>
 		
-		        <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-smartcn -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-smartcn</artifactId>
