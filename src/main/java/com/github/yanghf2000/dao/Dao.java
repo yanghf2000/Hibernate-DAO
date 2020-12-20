@@ -1005,13 +1005,15 @@ public abstract class Dao<T> {
      * @param ids
      */
     public void batchIndex(Collection<? extends Serializable> ids) {
-        if(ids == null || ids.isEmpty())
+        if(ids == null || ids.isEmpty()) {
             return;
+        }
 
         for(int i = 0, qty = 1000; ; i++) {
             List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
-            if(objs == null || objs.isEmpty())
+            if(objs == null || objs.isEmpty()) {
                 break;
+            }
 
             objs.forEach(e -> index(e));
         }
