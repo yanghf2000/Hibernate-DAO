@@ -11,6 +11,8 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.RangeMatchingContext;
@@ -30,7 +32,7 @@ import java.util.*;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class QuerySearchObject<T>{
 	
-	private FullTextSession fullTextSession;
+	private SearchSession searchSession;
 	private QueryBuilder qb;
 	private Criteria criteria;
 	private org.apache.lucene.search.Query query;
@@ -52,9 +54,9 @@ public class QuerySearchObject<T>{
 	
 	@SuppressWarnings("deprecation")
 	private QuerySearchObject(Session session, Class<T> clazz){
-		this.fullTextSession = Search.getFullTextSession(session);
-		this.qb = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(clazz).get();
-		this.criteria = fullTextSession.createCriteria(clazz);
+		this.searchSession = Search.session(session);
+		this.qb = searchSession.getSearchFactory().buildQueryBuilder().forEntity(clazz).get();
+		this.criteria = searchSession.createCriteria(clazz);
 		this.clazz = clazz;
 	}
 	
@@ -528,14 +530,17 @@ public class QuerySearchObject<T>{
      * @return
      */
     public List<Object[]> listWithDistance(String field, double centerLongitude, double centerLatitude, Integer pageNo, Integer pageSize) {
-    	if(field == null || "".equals(field))
-    		throw new IllegalArgumentException("Coordinates不能为空!");
+    	if(field == null || "".equals(field)) {
+			throw new IllegalArgumentException("Coordinates不能为空!");
+		}
     	
-    	if(centerLongitude <= -180 || centerLongitude > 180)
+    	if(centerLongitude <= -180 || centerLongitude > 180) {
 			throw new IllegalArgumentException("经度取值不正确!");
+		}
 		
-		if(centerLatitude < -90 || centerLatitude > 90)
+		if(centerLatitude < -90 || centerLatitude > 90) {
 			throw new IllegalArgumentException("纬度取值不正确!");
+		}
     	
     	return list(field, centerLongitude, centerLatitude, pageNo, pageSize);
     }
@@ -573,7 +578,7 @@ public class QuerySearchObject<T>{
     		bool.must(qb.all().createQuery());
     	
     	this.query = bool.createQuery();
-    	this.hibQuery  =fullTextSession.createFullTextQuery(query, clazz); 
+    	this.hibQuery  = searchSession.createFullTextQuery(query, clazz);
     	
     	hibQuery.setTimeout(60);
     	

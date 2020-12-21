@@ -99,8 +99,9 @@ public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
 	 * @return {@link CriteriaQuery}
 	 */
 	private CriteriaQuery<T> getStatCriteriaQuery(String field, String statType){
-		if(field == null)
+		if(field == null) {
 			field = "id";
+		}
 		
 		Selection selection;
 		Path x = extractPath(field);
