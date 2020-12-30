@@ -4,13 +4,15 @@ import com.github.yanghf2000.bridge.DateTimeFieldBridge;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.query.dsl.BooleanJunction;
@@ -33,14 +35,11 @@ import java.util.*;
 public class QuerySearchObject<T>{
 	
 	private SearchSession searchSession;
-	private QueryBuilder qb;
-	private Criteria criteria;
-	private org.apache.lucene.search.Query query;
-	private FullTextQuery hibQuery; 
-	
 	private Class<T> clazz;
-	private List<org.apache.lucene.search.Query> queries = new ArrayList<>();
 	private Set<String> joinFields = new HashSet<>();
+	private BooleanPredicateClausesStep<?> bool;
+
+	private LinkedHashMap<String, Object> queries = new LinkedHashMap<>();
 	
 	private List<SortField> sortFields = new ArrayList<>();
 	
@@ -55,8 +54,6 @@ public class QuerySearchObject<T>{
 	@SuppressWarnings("deprecation")
 	private QuerySearchObject(Session session, Class<T> clazz){
 		this.searchSession = Search.session(session);
-		this.qb = searchSession.getSearchFactory().buildQueryBuilder().forEntity(clazz).get();
-		this.criteria = searchSession.createCriteria(clazz);
 		this.clazz = clazz;
 	}
 	
@@ -259,8 +256,9 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> match(Collection values, String... fieldNames){
 		// 这个只是添加联表用的
-		for(String s : Objects.requireNonNull(fieldNames)) 
+		for(String s : Objects.requireNonNull(fieldNames))  {
 			needJoinTable(s);
+		}
 		
 		BooleanJunction<BooleanJunction> bool = qb.bool();
 		for(Object v : Objects.requireNonNull(values)) {
@@ -568,20 +566,31 @@ public class QuerySearchObject<T>{
      * @param pageSize 每页获取数量
      * @return {@link Map} list 结果集 count 总数量
      */
-    private Map<String, Object> search(String field, Double centerLongitude, Double centerLatitude, Integer pageNo, Integer pageSize) {
-    	BooleanJunction<BooleanJunction> bool = qb.bool();
-    	if(!queries.isEmpty()) {
-    		for(org.apache.lucene.search.Query q : queries) {
-    			bool.must(q);
-    		}
-    	}else 
-    		bool.must(qb.all().createQuery());
-    	
-    	this.query = bool.createQuery();
-    	this.hibQuery  = searchSession.createFullTextQuery(query, clazz);
-    	
-    	hibQuery.setTimeout(60);
-    	
+    private Map<String, Object> search(String field, Double centerLongitude,
+									   Double centerLatitude, Integer pageNo, Integer pageSize) {
+
+		SearchResult<T> searchResult = searchSession.search(clazz).where(f -> {
+			SearchPredicateFactory t = f;
+			BooleanPredicateClausesStep<?> bool = f.bool();
+			BooleanPredicateClausesStep<?> must = bool.must(f.match().field("").matching(""));
+			if (!queries.isEmpty()) {
+				queries.forEach((k, v) -> bool.must(f.match().field(k).matching(v)));
+			} else {
+				f.matchAll();
+			}
+			return bool;
+		}).fetch((pageNo - 1) * pageSize, pageSize);
+
+
+
+		long totalHitCount = searchResult.total().hitCount();
+		List<T> results = searchResult.hits();
+
+
+
+
+
+
     	if(!joinFields.isEmpty()) {
     		joinFields.forEach(j -> criteria.setFetchMode(j, FetchMode.JOIN));
     		hibQuery.setCriteriaQuery(criteria);
@@ -595,17 +604,6 @@ public class QuerySearchObject<T>{
     		hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
     		// 对于这种查询距离的类，要有getLocation方法，或者别的方法，此地方要传入属性名（实际不一定要有该属性，只要有get方法就行），具体见User类
     		hibQuery.setSpatialParameters(centerLatitude, centerLongitude, field);
-    	}
-    	
-    	if(pageNo != null && pageSize != null) {
-    		if(pageNo < 0)
-    			throw new IllegalArgumentException("页号不正确!");
-    		
-    		if(pageSize < 1)
-    			throw new IllegalArgumentException("每页数量不正确!");
-    		
-    		hibQuery.setFirstResult(pageNo * pageSize);
-    		hibQuery.setMaxResults(pageSize);
     	}
     	
     	Map<String, Object> map = new HashMap<>();

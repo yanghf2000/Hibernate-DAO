@@ -10,8 +10,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 
 import javax.persistence.criteria.*;
 import java.io.Serializable;
@@ -86,15 +86,15 @@ public abstract class Dao<T> {
      * 获取全文本索引session
      * @return
      */
-    protected FullTextSession getFullTextSession(){
-        return Search.getFullTextSession(getSession());
+    protected SearchSession getSearchSession(){
+        return Search.session(getSession());
     }
 
     /**
      * 获取全文本索引session
      * @return
      */
-    protected FullTextSession getFullTextSession(Integer timeout){
+    protected FullTextSession getSearchSession(Integer timeout){
         return Search.getFullTextSession(getSession(timeout));
     }
 
@@ -968,7 +968,7 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public void maintainIndex(Class... types) throws InterruptedException {
-    	getFullTextSession().createIndexer(Objects.requireNonNull(types)).startAndWait();
+    	getSearchSession().createIndexer(Objects.requireNonNull(types)).startAndWait();
     }
 
     /**
@@ -980,7 +980,7 @@ public abstract class Dao<T> {
      * this method forces an index operation.
      */
     public void index(T t) {
-        getFullTextSession().index(t);
+        getSearchSession().index(t);
     }
 
     /**
@@ -1029,7 +1029,7 @@ public abstract class Dao<T> {
      *
      */
     public void purge(Class<T> clazz, Serializable id) {
-        getFullTextSession().purge(clazz, Objects.requireNonNull(id));
+        getSearchSession().purge(clazz, Objects.requireNonNull(id));
     }
 
     /**
@@ -1071,14 +1071,14 @@ public abstract class Dao<T> {
      * @param clazz
      */
     public void purgeAll(Class<T> clazz) {
-        getFullTextSession().purgeAll(clazz);
+        getSearchSession().purgeAll(clazz);
     }
 
     /**
      * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
      */
     public void flushToIndexes() {
-        getFullTextSession().flushToIndexes();
+        getSearchSession().flushToIndexes();
     }
 
 }
