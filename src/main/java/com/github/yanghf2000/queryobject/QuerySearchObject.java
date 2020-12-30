@@ -1,27 +1,15 @@
 package com.github.yanghf2000.queryobject;
 
-import com.github.yanghf2000.bridge.DateTimeFieldBridge;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.query.dsl.BooleanJunction;
-import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.RangeMatchingContext;
-import org.hibernate.search.query.dsl.Unit;
-import org.hibernate.search.spatial.DistanceSortField;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -37,7 +25,9 @@ public class QuerySearchObject<T>{
 	private SearchSession searchSession;
 	private Class<T> clazz;
 	private Set<String> joinFields = new HashSet<>();
-	private BooleanPredicateClausesStep<?> bool;
+	private SearchScope<T> scope;
+
+	private List<MatchPredicateOptionsStep> steps;
 
 	private LinkedHashMap<String, Object> queries = new LinkedHashMap<>();
 	
@@ -55,6 +45,7 @@ public class QuerySearchObject<T>{
 	private QuerySearchObject(Session session, Class<T> clazz){
 		this.searchSession = Search.session(session);
 		this.clazz = clazz;
+		scope = searchSession.scope(clazz);
 	}
 	
 	// ********************************** 以下为添加条件 ********************************
@@ -80,16 +71,16 @@ public class QuerySearchObject<T>{
 		} catch (NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();
 		}
-		Annotation[] annotations = field.getAnnotations();
-		for(Annotation a : annotations){
-			if(a.annotationType() == FieldBridge.class){
-				FieldBridge fb = (FieldBridge)a;
-				if(fb.impl() == DateTimeFieldBridge.class)
-					val = DateTimeFieldBridge.toKey(value);
-			}
-		}
-		
-		queries.add(qb.phrase().onField(fieldName).sentence(val).createQuery());
+//		Annotation[] annotations = field.getAnnotations();
+//		for(Annotation a : annotations){
+//			if(a.annotationType() == FieldBridge.class){
+//				FieldBridge fb = (FieldBridge)a;
+//				if(fb.impl() == DateTimeFieldBridge.class)
+//					val = DateTimeFieldBridge.toKey(value);
+//			}
+//		}
+//
+//		queries.add(qb.phrase().onField(fieldName).sentence(val).createQuery());
 		return this;
 	}
 
@@ -122,7 +113,7 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> range(String fieldName, Object min, Object max, Class type){
 		needJoinTable(fieldName);
-		queries.add(qb.range().onField(fieldName).from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
+//		queries.add(qb.range().onField(fieldName).from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
 		return this;
 	}
 
@@ -134,19 +125,22 @@ public class QuerySearchObject<T>{
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 */
 	public QuerySearchObject<T> range(Object min, Object max, Class type, String... fieldNames){
-		RangeMatchingContext rangeMatchingContext = null;
-		for(int i = 0; i < fieldNames.length; i++) {
-			String fieldName = fieldNames[i];
-			needJoinTable(fieldName);
-			if(i == 0) {
-				rangeMatchingContext = qb.range().onField(fieldName);
-			} else {
-				rangeMatchingContext.andField(fieldName);
-			}
 
-		}
+		scope.predicate().range().fields(fieldNames).between(min, max);
 
-		queries.add(rangeMatchingContext.from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
+//		RangeMatchingContext rangeMatchingContext = null;
+//		for(int i = 0; i < fieldNames.length; i++) {
+//			String fieldName = fieldNames[i];
+//			needJoinTable(fieldName);
+//			if(i == 0) {
+//				rangeMatchingContext = qb.range().onField(fieldName);
+//			} else {
+//				rangeMatchingContext.andField(fieldName);
+//			}
+//
+//		}
+//
+//		queries.add(rangeMatchingContext.from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
 		return this;
 	}
 
@@ -169,7 +163,7 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> above(String fieldName, Object value, Class type){
 		needJoinTable(fieldName);
-		queries.add(qb.range().onField(fieldName).above(typeConver(value, type)).createQuery());
+//		queries.add(qb.range().onField(fieldName).above(typeConver(value, type)).createQuery());
 		return this;
 	}
 	
@@ -192,7 +186,7 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> below(String fieldName, Object value, Class type){
 		needJoinTable(fieldName);
-		queries.add(qb.range().onField(fieldName).below(typeConver(value, type)).createQuery());
+//		queries.add(qb.range().onField(fieldName).below(typeConver(value, type)).createQuery());
 		return this;
 	}
 	
@@ -227,14 +221,17 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> match(Object value, String... fieldNames){
 		// 这个只是添加联表用的
-    	for(String s : fieldNames) 
-    		needJoinTable(s);
+    	/*for(String s : fieldNames) {
+			needJoinTable(s);
+		}*/
     	
     	if(value instanceof String && value.toString().contains(" ")) {
     		return match(value.toString().split(" "), fieldNames);
     	}
+
+		steps.add(scope.predicate().match().fields(fieldNames).matching(value));
     	
-    	queries.add(qb.keyword().onFields(fieldNames).matching(value).createQuery());
+//    	queries.add(qb.keyword().onFields(fieldNames).matching(value).createQuery());
 		return this;
 	}
 	
@@ -260,12 +257,12 @@ public class QuerySearchObject<T>{
 			needJoinTable(s);
 		}
 		
-		BooleanJunction<BooleanJunction> bool = qb.bool();
-		for(Object v : Objects.requireNonNull(values)) {
-			bool.should(qb.keyword().onFields(fieldNames).matching(v).createQuery());
-		}
-		
-		queries.add(bool.createQuery());
+//		BooleanJunction<BooleanJunction> bool = qb.bool();
+//		for(Object v : Objects.requireNonNull(values)) {
+//			bool.should(qb.keyword().onFields(fieldNames).matching(v).createQuery());
+//		}
+//
+//		queries.add(bool.createQuery());
 		return this;
 	}
 	
@@ -277,10 +274,10 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> wildcardMatch(Object value, String... fieldNames){
 		// 这个只是添加联表用的
-		for(String s : fieldNames) 
-			needJoinTable(s);
-		
-		queries.add(qb.keyword().wildcard().onFields(fieldNames).matching(value + "*").createQuery());
+//		for(String s : fieldNames)
+//			needJoinTable(s);
+//
+//		queries.add(qb.keyword().wildcard().onFields(fieldNames).matching(value + "*").createQuery());
 		return this;
 	}
 
@@ -366,8 +363,9 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> sort(String field, SortField.Type type, boolean reverse){
-		if(field != null && !"".equals(field.trim())) 
+		if(field != null && !"".equals(field.trim())) {
 			sortFields.add(new SortField(field, type, reverse));
+		}
 		
 		return this;
 	}
@@ -397,8 +395,9 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> sortDistance(String field, boolean reverse){
-		if(centerLatitude == null && centerLongitude == null)
+		if(centerLatitude == null && centerLongitude == null) {
 			throw new IllegalArgumentException("经纬度不能为null!");
+		}
 		
 		return sortDistance(field, null, null, reverse);
 	}
@@ -423,7 +422,7 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> sortDistance(String field, Double centerLongitude, Double centerLatitude, boolean reverse){
-		sortFields.add(new DistanceSortField(centerLatitude, centerLongitude, field, reverse));
+//		sortFields.add(new DistanceSortField(centerLatitude, centerLongitude, field, reverse));
 		
 		setDistanceFields(field, centerLongitude, centerLatitude);
 		return this;
@@ -436,8 +435,9 @@ public class QuerySearchObject<T>{
 	 * @param centerLatitude 纬度
 	 */
 	private void setDistanceFields(String field, Double centerLongitude, Double centerLatitude) {
-		if(field != null && !"".equals(field))
+		if(field != null && !"".equals(field)) {
 			this.distanceField = field;
+		}
 		
 		if(centerLatitude != null && centerLongitude != null){
 			this.centerLatitude = centerLatitude;
@@ -471,20 +471,23 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> distance(double distanceInKilometers, double centerLongitude, double centerLatitude){
-		if(distanceInKilometers < 0)
+		if(distanceInKilometers < 0) {
 			throw new IllegalArgumentException("距离不能为负数!");
+		}
 		
-		if(centerLongitude <= -180 || centerLongitude > 180)
+		if(centerLongitude <= -180 || centerLongitude > 180) {
 			throw new IllegalArgumentException("经度取值不正确!");
+		}
 		
-		if(centerLatitude < -90 || centerLatitude > 90)
+		if(centerLatitude < -90 || centerLatitude > 90) {
 			throw new IllegalArgumentException("纬度取值不正确!");
+		}
 		
-		org.apache.lucene.search.Query luceneQuery = qb.spatial().within(distanceInKilometers, Unit.KM)
-																							   .ofLatitude( centerLatitude )
-																							   .andLongitude( centerLongitude )
-																							   .createQuery();
-		queries.add(luceneQuery);
+//		org.apache.lucene.search.Query luceneQuery = qb.spatial().within(distanceInKilometers, Unit.KM)
+//																							   .ofLatitude( centerLatitude )
+//																							   .andLongitude( centerLongitude )
+//																							   .createQuery();
+//		queries.add(luceneQuery);
 		setDistanceFields(null, centerLongitude, centerLatitude);
 		return this;
 	}
@@ -497,8 +500,9 @@ public class QuerySearchObject<T>{
 	 * @return
 	 */
 	public List<Object[]> listWithDistance(Integer pageNo, Integer pageSize) {
-		if(distanceField == null || "".equals(distanceField))
+		if(distanceField == null || "".equals(distanceField)) {
 			throw new IllegalArgumentException("查询距离的字段field不能为空!");
+		}
 		
 		return listWithDistance(distanceField, pageNo, pageSize);
 	}
@@ -512,8 +516,9 @@ public class QuerySearchObject<T>{
 	 * @return
 	 */
 	public List<Object[]> listWithDistance(String field, Integer pageNo, Integer pageSize) {
-		if(centerLatitude == null && centerLongitude == null)
+		if(centerLatitude == null && centerLongitude == null) {
 			throw new IllegalArgumentException("缺乏必要的经纬度参数!");
+		}
 		
 		return listWithDistance(field, centerLongitude, centerLatitude, pageNo, pageSize);
 	}
@@ -569,21 +574,35 @@ public class QuerySearchObject<T>{
     private Map<String, Object> search(String field, Double centerLongitude,
 									   Double centerLatitude, Integer pageNo, Integer pageSize) {
 
+		SearchScope<T> scope = searchSession.scope(clazz);
+		BooleanPredicateClausesStep<?> b = scope.predicate().bool();
+//		b.must(scope.predicate().match().field(""))
+
+
+		List<T> result = searchSession.search( scope )
+				.where( scope.predicate().match().field( "title" )
+						.matching( "robot" )
+						.toPredicate() )
+				.fetchHits( 20 );
+
+
+
 		SearchResult<T> searchResult = searchSession.search(clazz).where(f -> {
-			SearchPredicateFactory t = f;
-			BooleanPredicateClausesStep<?> bool = f.bool();
-			BooleanPredicateClausesStep<?> must = bool.must(f.match().field("").matching(""));
-			if (!queries.isEmpty()) {
-				queries.forEach((k, v) -> bool.must(f.match().field(k).matching(v)));
+			BooleanPredicateClausesStep s = null;
+			if (!steps.isEmpty()) {
+				BooleanPredicateClausesStep<?> bool = f.bool();
+				for (MatchPredicateOptionsStep step : steps) {
+					bool = bool.must(step);
+				}
+				return bool;
 			} else {
-				f.matchAll();
+				return f.matchAll();
 			}
-			return bool;
 		}).fetch((pageNo - 1) * pageSize, pageSize);
 
 
 
-		long totalHitCount = searchResult.total().hitCount();
+		this.count = searchResult.total().hitCount();
 		List<T> results = searchResult.hits();
 
 
@@ -591,30 +610,30 @@ public class QuerySearchObject<T>{
 
 
 
-    	if(!joinFields.isEmpty()) {
-    		joinFields.forEach(j -> criteria.setFetchMode(j, FetchMode.JOIN));
-    		hibQuery.setCriteriaQuery(criteria);
-    	}
-    	
-    	if(!sortFields.isEmpty()) {
-    		hibQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
-    	}
-    	
-    	if(centerLatitude != null && centerLongitude != null && field != null && !"".equals(field)) {
-    		hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
-    		// 对于这种查询距离的类，要有getLocation方法，或者别的方法，此地方要传入属性名（实际不一定要有该属性，只要有get方法就行），具体见User类
-    		hibQuery.setSpatialParameters(centerLatitude, centerLongitude, field);
-    	}
-    	
+//    	if(!joinFields.isEmpty()) {
+//    		joinFields.forEach(j -> criteria.setFetchMode(j, FetchMode.JOIN));
+//    		hibQuery.setCriteriaQuery(criteria);
+//    	}
+//
+//    	if(!sortFields.isEmpty()) {
+//    		hibQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
+//    	}
+//
+//    	if(centerLatitude != null && centerLongitude != null && field != null && !"".equals(field)) {
+//    		hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
+//    		// 对于这种查询距离的类，要有getLocation方法，或者别的方法，此地方要传入属性名（实际不一定要有该属性，只要有get方法就行），具体见User类
+//    		hibQuery.setSpatialParameters(centerLatitude, centerLongitude, field);
+//    	}
+//
     	Map<String, Object> map = new HashMap<>();
-    	this.count = hibQuery.getResultSize();
-    	// 这一句只能话在前面，如果先获取了List，再获取数量则会报错
+//    	this.count = hibQuery.getResultSize();
+//    	// 这一句只能话在前面，如果先获取了List，再获取数量则会报错
     	map.put("count", count);
-    	
-    	List list = hibQuery.list();
-    	// 有些情况下返回的集合不是java.util.ArrayList.ArrayList, 比如获取到单个值，是Collections中的SingleList, 
-    	// 在某些操作下会出异常，所以封装处理过
-		map.put("list", list == null ? new ArrayList<>() : new ArrayList<>(list));
+//
+//    	List list = hibQuery.list();
+//    	// 有些情况下返回的集合不是java.util.ArrayList.ArrayList, 比如获取到单个值，是Collections中的SingleList,
+//    	// 在某些操作下会出异常，所以封装处理过
+		map.put("list", results == null ? new ArrayList<>() : new ArrayList<>(results));
     	
     	return map;
     }

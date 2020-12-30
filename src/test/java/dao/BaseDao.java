@@ -36,6 +36,7 @@ public abstract class BaseDao<T extends BaseEntity> extends Dao<T> {
 		return sessionFactory;
 	}
 	
+    @Override
     public synchronized Session getSession() {
     	if(session != null)
     		return session;

@@ -1,9 +1,8 @@
 package entity;
 
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,14 +12,14 @@ import java.util.List;
 
 @Entity
 @Indexed
-@Analyzer(impl = SmartChineseAnalyzer.class)
 public class Category extends BaseIdEntity {
 
 	private static final long serialVersionUID = 2140769021252599177L;
 
-	@Field
+	@FullTextField
 	private String name;
-	
+
+	@IndexedEmbedded(includeDepth = 1)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "category", orphanRemoval = true)
 	private List<ProductCategory> products;
 

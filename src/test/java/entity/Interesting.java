@@ -25,6 +25,10 @@ public class Interesting extends BaseIdEntity {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "interesting", orphanRemoval = true)
 	private List<UserInteresting> users = new ArrayList<>();
 
+	public Interesting() {
+
+	}
+
 	public String getName() {
 		return name;
 	}

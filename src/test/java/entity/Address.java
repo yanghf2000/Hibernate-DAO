@@ -1,7 +1,8 @@
 package entity;
 
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,10 +10,11 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Indexed
-@Analyzer(impl = SmartChineseAnalyzer.class)
 public class Address extends BaseIdEntity{
 
 	private static final long serialVersionUID = 741793265894130462L;
+
+	public Address(){}
 	
 	public Address(Long id, String province, String city, String county, String street) {
 		this.id = id;
@@ -33,8 +35,7 @@ public class Address extends BaseIdEntity{
 	
 	private String county;
 
-	@SortableField
-	@Field
+	@FullTextField
 	private String street;
 
 	public User getUser() {

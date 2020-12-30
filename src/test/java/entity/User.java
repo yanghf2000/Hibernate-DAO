@@ -1,15 +1,16 @@
 package entity;
 
-import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
-import com.github.yanghf2000.bridge.DateTimeFieldBridge;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.search.annotations.*;
-import org.hibernate.search.spatial.Coordinates;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import vo.UserVo;
 
-import javax.persistence.Index;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,12 +26,11 @@ import java.util.Set;
 		@ColumnResult(name = "id", type = Long.class), @ColumnResult(name = "name"), // string类型可以不用指明
 		@ColumnResult(name = "age", type = int.class) // 类似int等类型要特殊指明
 }))
-@Spatial(spatialMode = SpatialMode.HASH)
+//@Spatial(spatialMode = SpatialMode.HASH)
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @Indexed
-@Analyzer(impl = SmartChineseAnalyzer.class)
 public class User extends BaseIdEntity implements Comparable<User>{
 
 	private static final long serialVersionUID = 741793537894130462L;
@@ -51,29 +51,23 @@ public class User extends BaseIdEntity implements Comparable<User>{
 		this.age = age;
 	}
 
-	@SortableField
-	@Field(index = org.hibernate.search.annotations.Index.YES, analyze = Analyze.YES, store = Store.NO)
+	@FullTextField
+	@GenericField(sortable = Sortable.YES)
 	private String name;
 
-	@Field
-	@SortableField
-	@NumericField
+	@GenericField(sortable = Sortable.YES)
 	private int age;
 
 	@Enumerated(EnumType.STRING)
 	private Sex sex;
 	
-	@SortableField
-	@Field(index = org.hibernate.search.annotations.Index.YES, analyze = Analyze.NO, store = Store.NO)
-	@FieldBridge(impl = DateTimeFieldBridge.class)
+	@GenericField(sortable = Sortable.YES)
 	private LocalDate birthday;
 
-	@Field
+	@FullTextField
 	private String info;
 
-	@Field
-	@SortableField
-	@FieldBridge(impl = BigDecimalNumericFieldBridge.class)
+	@GenericField(sortable = Sortable.YES)
 	private BigDecimal property;
 
 	// includePaths 写出要查询的字段，这个可以不加，但如果加了，对方类的字段上必须加上@Field注解
@@ -84,7 +78,6 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	// and was encountered again in entity entity.User at path 'user.addresses.'.
 	// Set the @IndexedEmbedded.depth value explicitly to fix the problem.
 //	@IndexedEmbedded(depth = 1)
-	@ContainedIn
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<Address> addresses;
 
@@ -99,21 +92,21 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@Longitude
 	private Double longitude;
 
-	@SortableField
-	@Spatial(spatialMode = SpatialMode.HASH)
-	public Coordinates getLocation() {
-		return new Coordinates() {
-			@Override
-			public Double getLatitude() {
-				return latitude;
-			}
-
-			@Override
-			public Double getLongitude() {
-				return longitude;
-			}
-		};
-	}
+//	@SortableField
+//	@Spatial(spatialMode = SpatialMode.HASH)
+//	public Coordinates getLocation() {
+//		return new Coordinates() {
+//			@Override
+//			public Double getLatitude() {
+//				return latitude;
+//			}
+//
+//			@Override
+//			public Double getLongitude() {
+//				return longitude;
+//			}
+//		};
+//	}
 	
 	@Version
 	private int version;
@@ -125,12 +118,10 @@ public class User extends BaseIdEntity implements Comparable<User>{
 		return (int) (this.getId() - o.getId());
 	}
 
-	@Field
-	@FieldBridge(impl = DateTimeFieldBridge.class)
+	@GenericField
 	private LocalTime time;
 	
-	@Field
-	@FieldBridge(impl = DateTimeFieldBridge.class)
+	@GenericField
 	private LocalDateTime dateTime;
 	
 //	@Type(type = "descriptor.CommaDelimitedListToStringsDescriptor")
@@ -138,7 +129,6 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	private List<String> jobs = new ArrayList<>();
 
 	// 对于以下想处理集合的，但没有独立类的，也是可以搜索的
-	@Field
 	@IndexedEmbedded
 	@Column( name = "sex", columnDefinition = "varchar(10) NOT NULL")
 	@JoinTable(name = "user_sexes", joinColumns = {@JoinColumn(name = "user_id")},

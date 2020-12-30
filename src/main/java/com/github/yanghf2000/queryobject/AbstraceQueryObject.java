@@ -133,9 +133,9 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andGe(String fieldName, Comparable value){
-		if(value instanceof Number)
+		if(value instanceof Number) {
 			return addAndCondition(builder.ge(extractPath(fieldName), (Number)value));
-		else {
+		} else {
 			// 由于放入参数时要指定类型，但此处没有办法加上Object的泛型，所以暂时先指定Comparable，比较大多数参与比较的类型都实现了Comparable接口
 			Path<Comparable> path = extractPath(fieldName);
 			return addAndCondition(builder.greaterThanOrEqualTo(path, (Comparable)value));
@@ -149,9 +149,9 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andGt(String fieldName, Comparable value){
-		if(value instanceof Number)
+		if(value instanceof Number) {
 			return addAndCondition(builder.gt(extractPath(fieldName), (Number)value));
-		else {
+		} else {
 			Path<Comparable> path = extractPath(fieldName);
 			return addAndCondition(builder.greaterThan(path, (Comparable)value));
 		}
@@ -164,9 +164,9 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andLe(String fieldName, Comparable value){
-		if(value instanceof Number)
+		if(value instanceof Number) {
 			return addAndCondition(builder.le(extractPath(fieldName), (Number)value));
-		else {
+		} else {
 			Path<Comparable> path = extractPath(fieldName);
 			return addAndCondition(builder.lessThanOrEqualTo(path, (Comparable)value));
 		}
@@ -179,9 +179,9 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andLt(String fieldName, Comparable value){
-		if(value instanceof Number)
+		if(value instanceof Number) {
 			return addAndCondition(builder.lt(extractPath(fieldName), (Number)value));
-		else {
+		} else {
 			Path<Comparable> path = extractPath(fieldName);
 			return addAndCondition(builder.lessThan(path, (Comparable)value));
 		}
@@ -234,12 +234,14 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @return {@link AbstraceQueryObject}
 	 */
 	public O andLike(String fieldName, String... values){
-		if(values == null || values.length < 1)
+		if(values == null || values.length < 1) {
 			throw new IllegalArgumentException("传入的参数不能为空!");
+		}
 		
 		Predicate[] pres = new Predicate[values.length];
-		for(int i = 0; i < values.length; i++)
+		for(int i = 0; i < values.length; i++) {
 			pres[i] = builder.like(extractPath(fieldName), values[i]);
+		}
 		
 		return addAndCondition(builder.or(pres));
 	}
@@ -255,8 +257,9 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 			throw new IllegalArgumentException("传入的参数不能为空!");
 		
 		Predicate[] pres = new Predicate[values.length];
-		for(int i = 0; i < values.length; i++)
+		for(int i = 0; i < values.length; i++) {
 			pres[i] = builder.like(extractPath(fieldName), values[i]);
+		}
 		
 		orPres.add(builder.or(pres));
 		return (O)this;
@@ -362,10 +365,11 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 						fetch = op.get();
 						fetches = fetch.getFetches();
 					} else {
-						if(fetch != null)
+						if(fetch != null) {
 							fetch = fetch.fetch(arr[i]);
-						else 
+						} else {
 							break;
+						}
 					}
 					
 					if(fetch != null) {
@@ -386,10 +390,11 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 						join = op.get();
 						joins = join.getJoins();
 					} else {
-						if(join != null)
+						if(join != null) {
 							join = join.join(arr[i]);
-						else 
+						} else {
 							break;
+						}
 					}
 					
 					if(join != null) {
@@ -414,13 +419,15 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 			Optional<Fetch> op = fetches.stream().filter(f -> f.getAttribute().getName().equals(fieldName)).findFirst();
 			if(op.isPresent()) {
 				Fetch f = op.get();
-				if(f instanceof Path)
+				if(f instanceof Path) {
 					return (Path) f;
+				}
 			}else {
 				Set<Join> joins = root.getJoins();
 				Optional<Join> o = joins.stream().filter(j -> j.getAttribute().getName().equals(fieldName)).findFirst();
-				if(o.isPresent()) 
+				if(o.isPresent()) {
 					return o.get();
+				}
 			}
 			
 			// 对于是非关联对象的进行获取
@@ -436,11 +443,13 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
      * @return
      */
     protected int getStart(int pageNo, int size){
-    	if(pageNo < 0)
-    		pageNo = 0;
+    	if(pageNo < 0) {
+			pageNo = 0;
+		}
     	
-    	if(size < 1)
-    		size = 10;
+    	if(size < 1) {
+			size = 10;
+		}
     	
     	return pageNo * size;
     }
@@ -452,11 +461,13 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
      * @param size
      */
     protected void addPage(Query query, Integer pageNo, Integer size){
-    	if(pageNo != null)
+    	if(pageNo != null) {
 			query.setFirstResult(size == null ? pageNo : getStart(pageNo, size));
+		}
 
-    	if(size != null)
-    		query.setMaxResults(size);
+    	if(size != null) {
+			query.setMaxResults(size);
+		}
     }
     
 }

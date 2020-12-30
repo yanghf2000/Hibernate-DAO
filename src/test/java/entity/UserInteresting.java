@@ -30,6 +30,10 @@ public class UserInteresting extends BaseIdEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Interesting interesting;
 
+	public UserInteresting() {
+
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

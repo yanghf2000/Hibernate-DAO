@@ -94,8 +94,8 @@ public abstract class Dao<T> {
      * 获取全文本索引session
      * @return
      */
-    protected FullTextSession getSearchSession(Integer timeout){
-        return Search.getFullTextSession(getSession(timeout));
+    protected SearchSession getSearchSession(Integer timeout){
+        return Search.session(getSession(timeout));
     }
 
     /**
@@ -213,10 +213,11 @@ public abstract class Dao<T> {
     	Root<T> root = criteria.from(clazz);
     	Path<Object> path = root.get(propertyName);
     	
-    	if(value instanceof List)
-    		criteria.where(path.in((List) value));
-    	else 
-    		criteria.where(builder.equal(path, value));
+    	if(value instanceof List) {
+            criteria.where(path.in((List) value));
+        } else {
+            criteria.where(builder.equal(path, value));
+        }
     		
     	return getSession().createQuery(criteria).executeUpdate();
     }
@@ -474,8 +475,9 @@ public abstract class Dao<T> {
                           LockOptions lockOptions, Integer first, Integer size, Object... objects) {
     	Query query = (timeout == null ? getSession() : getSession(timeout)).createQuery(hql);
     	
-    	if (lockOptions != null)
-    		query.setLockOptions(lockOptions);
+    	if (lockOptions != null) {
+            query.setLockOptions(lockOptions);
+        }
 
         addParameters(query, false, objects);
     	setLimitProperty(query, first, size);
@@ -496,10 +498,11 @@ public abstract class Dao<T> {
         Query query = getSession().createQuery(hql);
         
         params.forEach((k, v) -> {
-        	if (v instanceof Collection)
+        	if (v instanceof Collection) {
                 query.setParameterList(k, (Collection) v);
-             else 
+            } else {
                 query.setParameter(k, v);
+            }
         });
         
         setLimitProperty(query, first, size);
@@ -518,8 +521,9 @@ public abstract class Dao<T> {
     public long countByHql(String hql, Object... objects) {
         // 如果不是以select count 开头则加上select count(*)
         String pre = hql.substring(0, hql.indexOf("from")).trim().toLowerCase();
-        if (!(pre.contains("select") && pre.contains("count")))
+        if (!(pre.contains("select") && pre.contains("count"))) {
             hql = "select count(*) " + hql.substring(hql.indexOf("from"));
+        }
 
         Number num = findSingleValueByHql(hql, objects);
         return num == null ? 0 : num.longValue();
@@ -533,8 +537,9 @@ public abstract class Dao<T> {
      */
     public long countBySql(String sql, Object... objects) {
         String pre = sql.substring(0, sql.indexOf("from")).trim().toLowerCase();
-        if (!(pre.contains("select") && pre.contains("count")))
+        if (!(pre.contains("select") && pre.contains("count"))) {
             sql = "select count(*) " + sql.substring(sql.indexOf("from"));
+        }
 
         Number num = findSingleValueBySql(null, sql, objects);
         return num == null ? 0 : num.longValue();
@@ -624,8 +629,9 @@ public abstract class Dao<T> {
 
         addParameters(query, true, objects);
 
-        if (resultSetMapping != null && !"".equals(resultSetMapping.trim()))
+        if (resultSetMapping != null && !"".equals(resultSetMapping.trim())) {
             query.setResultSetMapping(resultSetMapping);
+        }
 
         setLimitProperty(query, first, size);
 
@@ -698,8 +704,9 @@ public abstract class Dao<T> {
      * @param size		获取数量
      */
     private void setLimitProperty(Query<Object> query, Integer first, Integer size) {
-        if (first != null && first >= 0 && size != null && size > 0)
+        if (first != null && first >= 0 && size != null && size > 0) {
             query.setFirstResult(first).setMaxResults(size);
+        }
     }
     
     
@@ -938,37 +945,37 @@ public abstract class Dao<T> {
      * @return
      */
     public List<T> search(String key, boolean reverse, String orderField, int pageNo, int pageSize, String[] fields, String[] joinFields) {
-    	if(fields == null || fields.length < 1)
-    		throw new IllegalArgumentException("要查找的字段不能为空!");
+    	if(fields == null || fields.length < 1) {
+            throw new IllegalArgumentException("要查找的字段不能为空!");
+        }
     	
     	QuerySearchObject<T> qo = this.getQuerySearchObject().match(key, fields);
-    	if(joinFields != null && joinFields.length > 0) 
-    		for(String join : joinFields)
-    			qo.join(join);
+    	if(joinFields != null && joinFields.length > 0) {
+            for(String join : joinFields) {
+                qo.join(join);
+            }
+        }
     	
-    	if(orderField != null && !"".equals(orderField))
-    		qo.sort(orderField, reverse);
+    	if(orderField != null && !"".equals(orderField)) {
+            qo.sort(orderField, reverse);
+        }
     	
     	return qo.list(pageNo, pageSize);
     }
     
     /**
      * hibernate search索引维护
-     * @throws InterruptedException 
-     */
-    public void maintainIndex() throws InterruptedException {
-    	FullTextSession fullTextSession = Search.getFullTextSession(getSession());
-		fullTextSession.createIndexer().startAndWait();
-    }
-    
-    /**
-     * hibernate search索引维护
-     * @param types			要维护的类
+     * @param types			要维护的类，为空时维护所有
      * @throws InterruptedException
      */
     @SuppressWarnings("rawtypes")
 	public void maintainIndex(Class... types) throws InterruptedException {
-    	getSearchSession().createIndexer(Objects.requireNonNull(types)).startAndWait();
+        SearchSession searchSession = Search.session(getSession());
+        if(types == null || types.length < 1) {
+            searchSession.massIndexer().startAndWait();
+        } else {
+            Search.session(getSession()).massIndexer(Objects.requireNonNull(types)).startAndWait();
+        }
     }
 
     /**
@@ -976,11 +983,10 @@ public abstract class Dao<T> {
      * Indexation is batched per transaction: if a transaction is active, the operation
      * will not affect the index at least until commit.
      * <p>
-     * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity will be ignored:
      * this method forces an index operation.
      */
     public void index(T t) {
-        getSearchSession().index(t);
+        getSearchSession().indexingPlan().addOrUpdate(t);
     }
 
     /**
@@ -988,15 +994,13 @@ public abstract class Dao<T> {
      * @param ids
      */
     public void batchIndex(Serializable... ids) {
-        if(ids == null || ids.length < 1)
-            return;
-
-        for(int i = 0, qty = 1000; ; i++) {
-            List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
-            if(objs == null || objs.isEmpty())
-                break;
-
-            objs.forEach(e -> index(e));
+        if(ids != null && ids.length > 0) {
+            for(int i = 0, qty = 1000; ; i++) {
+                List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
+                if(objs != null && !objs.isEmpty()) {
+                    objs.forEach(this::index);
+                }
+            }
         }
     }
 
@@ -1005,15 +1009,8 @@ public abstract class Dao<T> {
      * @param ids
      */
     public void batchIndex(Collection<? extends Serializable> ids) {
-        if(ids == null || ids.isEmpty())
-            return;
-
-        for(int i = 0, qty = 1000; ; i++) {
-            List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
-            if(objs == null || objs.isEmpty())
-                break;
-
-            objs.forEach(e -> index(e));
+        if(ids != null && ids.size() > 0) {
+            batchIndex(ids.toArray(new Serializable[0]));
         }
     }
 
@@ -1022,34 +1019,34 @@ public abstract class Dao<T> {
      * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
      * case this method behaves like {@link #purgeAll(Class)}.
      * <p>
-     * Any {@link org.hibernate.search.indexes.interceptor.EntityIndexingInterceptor} registered on the entity will be ignored:
      * this method forces a purge operation.
-     * @param clazz
      * @param id
      *
      */
-    public void purge(Class<T> clazz, Serializable id) {
-        getSearchSession().purge(clazz, Objects.requireNonNull(id));
+    public void deleteIndex(Serializable id) {
+        T t = this.getQueryObject().andEqual("id", id).getOne();
+        if(t != null) {
+            getSearchSession().indexingPlan().delete(t);
+        }
     }
 
     /**
-     * 删除一个索引，
-     * @param id id为null时删除该类所有索引
+     * 删除索引
+     * @param t
      */
-    public void purge(Serializable id) {
-        purge(this.clazz, Objects.requireNonNull(id));
+    public void deleteIndex(T t) {
+        getSearchSession().indexingPlan().delete(t);
     }
 
     /**
      * 批量删除索引
      * @param ids
      */
-    public void batchPurge(Serializable... ids) {
-        if(ids == null || ids.length < 1)
-            return;
-
-        for (Serializable id : ids) {
-            purge(id);
+    public void batchDeleteIndex(Serializable... ids) {
+        if(ids != null && ids.length > 0) {
+            for (Serializable id : ids) {
+                deleteIndex(id);
+            }
         }
     }
 
@@ -1057,12 +1054,9 @@ public abstract class Dao<T> {
      * 批量删除索引
      * @param ids
      */
-    public void batchPurge(Collection<? extends Serializable> ids) {
-        if(ids == null || ids.isEmpty())
-            return;
-
-        for (Serializable id : ids) {
-            purge(id);
+    public void batchDeleteIndex(Collection<? extends Serializable> ids) {
+        if(ids != null && ids.size() > 0) {
+            batchDeleteIndex(ids.toArray(new Serializable[0]));
         }
     }
 
@@ -1071,14 +1065,14 @@ public abstract class Dao<T> {
      * @param clazz
      */
     public void purgeAll(Class<T> clazz) {
-        getSearchSession().purgeAll(clazz);
+        getSearchSession().workspace(clazz).purge();
     }
 
     /**
      * Flush all index changes forcing Hibernate Search to apply all changes to the index not waiting for the batch limit.
      */
     public void flushToIndexes() {
-        getSearchSession().flushToIndexes();
+        getSearchSession().workspace().flush();
     }
 
 }

@@ -1,10 +1,10 @@
 package entity;
 
-import com.github.yanghf2000.bridge.BigDecimalNumericFieldBridge;
-import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,32 +15,29 @@ import java.util.Map;
 
 @Entity
 @Indexed
-@Analyzer(impl = SmartChineseAnalyzer.class)
 public class Product extends BaseIdEntity {
 
 	private static final long serialVersionUID = 3190769021252599177L;
 
-	@SortableField
-	@Field(analyze = Analyze.YES, norms = Norms.NO)
+	@FullTextField
+	@GenericField(sortable = Sortable.YES)
 	private String name;
 	
-	@Field
+	@FullTextField
 	@Column(length = 100)
 	private String subtitle;
 	
 	/**
 	 * 如果查询的比较深，则要加depth
 	 */
-	@IndexedEmbedded(depth = 2)
+	@IndexedEmbedded(includeDepth = 2)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product", orphanRemoval = false)
 	private List<ProductCategory> categories;
 	
-	@Field
+	@GenericField(sortable = Sortable.YES)
 	// 数字类型，排序 比较等用
 	// 若使用的FieldBridge实现了MetadataProvidingFieldBridge接口，则可以不用加@NumericField注解
-//	@NumericField
-	@SortableField
-	
+
 	// 这样会把数字转换成字符串，但排序时会出错
 //	id: 5, name: 板栗, subtitle: 糖炒板栗, price: 34.00
 //	id: 2, name: 手机, subtitle: 小米手机, price: 3000.00
@@ -48,16 +45,12 @@ public class Product extends BaseIdEntity {
 //	id: 7, name: 果子, subtitle: 陕西红富士, price: 243.36
 //	@FieldBridge(impl = DoubleBridge.class)	
 	
-	@FieldBridge(impl = BigDecimalNumericFieldBridge.class, 
-				params = {@Parameter(name = "type", value = "double"), @Parameter(name = "sortable", value = "true")})
 	private BigDecimal price;
 	
-	@Field(norms = Norms.NO, store = Store.NO, index = Index.NO)
-	@SortableField
-	@DateBridge(resolution = Resolution.DAY)
+	@GenericField(sortable = Sortable.YES)
 	private LocalDate publishTime;
 	
-	@IndexedEmbedded(includeEmbeddedObjectId = true, depth = 2, includePaths = {"id", "name", "user.id"})
+	@IndexedEmbedded(includeEmbeddedObjectId = true, includeDepth = 2, includePaths = {"id", "name", "user.id"})
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Company company;
 

@@ -1,6 +1,6 @@
 package entity;
 
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
