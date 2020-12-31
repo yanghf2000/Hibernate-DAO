@@ -17,7 +17,7 @@ import java.util.*;
  * 2017-12-10
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class QueryObject<T> extends AbstraceQueryObject<QueryObject<T>, T>{
+public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	
 	public final static String COUNT = "count";
 	public final static String MAX = "max";

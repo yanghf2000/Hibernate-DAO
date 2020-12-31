@@ -12,7 +12,7 @@ import org.hibernate.Session;
  * 2018-1-25
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class QueryDeleteObject<T> extends AbstraceQueryObject<QueryDeleteObject<T>, T>{
+public class QueryDeleteObject<T> extends AbstractQueryObject<QueryDeleteObject<T>, T> {
 	
 	private CriteriaDelete<T> criteria;
 	

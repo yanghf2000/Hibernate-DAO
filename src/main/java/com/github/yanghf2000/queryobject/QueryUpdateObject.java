@@ -16,7 +16,7 @@ import com.github.yanghf2000.dao.FieldsAndValuesMap;
  * 2018-1-25
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class QueryUpdateObject<T> extends AbstraceQueryObject<QueryUpdateObject<T>, T>{
+public class QueryUpdateObject<T> extends AbstractQueryObject<QueryUpdateObject<T>, T> {
 	
 	private CriteriaUpdate<T> criteria;
 	

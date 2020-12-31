@@ -27,10 +27,11 @@ public class QuerySearchObject<T>{
 	private Set<String> joinFields = new HashSet<>();
 	private SearchScope<T> scope;
 
-	private List<MatchPredicateOptionsStep> steps;
+	/**
+	 * 查询条件
+	 */
+	private List<MatchPredicateOptionsStep> queries = new ArrayList<>();
 
-	private LinkedHashMap<String, Object> queries = new LinkedHashMap<>();
-	
 	private List<SortField> sortFields = new ArrayList<>();
 	
 	// 和求距离相关
@@ -229,7 +230,7 @@ public class QuerySearchObject<T>{
     		return match(value.toString().split(" "), fieldNames);
     	}
 
-		steps.add(scope.predicate().match().fields(fieldNames).matching(value));
+		queries.add(scope.predicate().match().fields(fieldNames).matching(value));
     	
 //    	queries.add(qb.keyword().onFields(fieldNames).matching(value).createQuery());
 		return this;
@@ -574,41 +575,31 @@ public class QuerySearchObject<T>{
     private Map<String, Object> search(String field, Double centerLongitude,
 									   Double centerLatitude, Integer pageNo, Integer pageSize) {
 
-		SearchScope<T> scope = searchSession.scope(clazz);
-		BooleanPredicateClausesStep<?> b = scope.predicate().bool();
+//		BooleanPredicateClausesStep<?> b = scope.predicate().bool();
 //		b.must(scope.predicate().match().field(""))
 
 
-		List<T> result = searchSession.search( scope )
-				.where( scope.predicate().match().field( "title" )
-						.matching( "robot" )
-						.toPredicate() )
-				.fetchHits( 20 );
+//		List<T> result = searchSession.search( scope )
+//				.where( scope.predicate().match().field( "title" )
+//						.matching( "robot" )
+//						.toPredicate() )
+//				.fetchHits( 20 );
 
-
-
+		SearchScope<T> scope = searchSession.scope(clazz);
 		SearchResult<T> searchResult = searchSession.search(clazz).where(f -> {
-			BooleanPredicateClausesStep s = null;
-			if (!steps.isEmpty()) {
-				BooleanPredicateClausesStep<?> bool = f.bool();
-				for (MatchPredicateOptionsStep step : steps) {
-					bool = bool.must(step);
-				}
-				return bool;
-			} else {
+			if(queries.isEmpty()) {
 				return f.matchAll();
 			}
+
+			BooleanPredicateClausesStep<?> bool = f.bool();
+			for (MatchPredicateOptionsStep query : queries) {
+				bool = bool.must(query);
+			}
+			return bool;
 		}).fetch((pageNo - 1) * pageSize, pageSize);
-
-
 
 		this.count = searchResult.total().hitCount();
 		List<T> results = searchResult.hits();
-
-
-
-
-
 
 //    	if(!joinFields.isEmpty()) {
 //    		joinFields.forEach(j -> criteria.setFetchMode(j, FetchMode.JOIN));

@@ -14,7 +14,7 @@ import java.util.*;
  * 2017-12-10
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
+public abstract class AbstractQueryObject<O extends AbstractQueryObject, T>{
 	
 	public final static String FETCH = "fetch";
 	
@@ -41,7 +41,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 */
 	protected List<Predicate> orPres = new ArrayList<>();
 	
-	protected AbstraceQueryObject(Session session, Class<T> clazz){
+	protected AbstractQueryObject(Session session, Class<T> clazz){
 		this.session = session;
 		this.builder = session.getCriteriaBuilder();
 		this.clazz = clazz;
@@ -63,7 +63,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 等于，如果value是null，用is null
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andEqual(String fieldName, Object value){
 		if(value == null) {
@@ -76,7 +76,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 不等于，如果value是null，用is not null
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andNotEqual(String fieldName, Object value){
 		if(value == null) {
@@ -130,7 +130,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 大于等于
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andGe(String fieldName, Comparable value){
 		if(value instanceof Number) {
@@ -146,7 +146,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 大于
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andGt(String fieldName, Comparable value){
 		if(value instanceof Number) {
@@ -161,7 +161,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 小于等于
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andLe(String fieldName, Comparable value){
 		if(value instanceof Number) {
@@ -176,7 +176,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 小于
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andLt(String fieldName, Comparable value){
 		if(value instanceof Number) {
@@ -193,7 +193,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @param fieldName 字段名
 	 * @param low				小的值
 	 * @param high				大的值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andBetween(String fieldName, Comparable low, Comparable high){
 		
@@ -206,7 +206,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * @param fieldName 	字段名
 	 * @param low				小的值
 	 * @param high				大的值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O orBetween(String fieldName, Comparable low, Comparable high){
 		
@@ -220,7 +220,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * 或
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O orEqual(String fieldName, Object value){
 		orPres.add(builder.equal(extractPath(fieldName), value));
@@ -231,7 +231,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * and like
 	 * @param fieldName 字段名
 	 * @param values like的值, 这里不负责加%，如果需要的话要加好传进来
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andLike(String fieldName, String... values){
 		if(values == null || values.length < 1) {
@@ -250,7 +250,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * or like
 	 * @param fieldName 字段名
 	 * @param @param values like的值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O orLike(String fieldName, String... values){
 		if(values == null || values.length < 1)
@@ -269,7 +269,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * and in
 	 * @param fieldName 字段名
 	 * @param col 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andIn(String fieldName, Collection col){
 		return addAndCondition(builder.in(extractPath(fieldName)).value(Objects.requireNonNull(col)));
@@ -279,7 +279,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * and in
 	 * @param fieldName 字段名
 	 * @param arr 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andIn(String fieldName, Object[] arr){
 		return andIn(fieldName, Arrays.asList(arr));
@@ -289,7 +289,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * and not in
 	 * @param fieldName 字段名
 	 * @param list 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andNotIn(String fieldName, List list){
 		return addAndCondition(builder.not(builder.in(extractPath(fieldName)).value(Objects.requireNonNull(list))));
@@ -299,7 +299,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * and not in
 	 * @param fieldName 字段名
 	 * @param arr 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O andNotIn(String fieldName, Object[] arr){
 		return andNotIn(fieldName, Arrays.asList(arr));
@@ -309,7 +309,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * or in
 	 * @param fieldName 字段名
 	 * @param list 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O orIn(String fieldName, List list){
 		orPres.add(builder.in(extractPath(fieldName)).value(list));
@@ -320,7 +320,7 @@ public abstract class AbstraceQueryObject<O extends AbstraceQueryObject, T>{
 	 * or in
 	 * @param fieldName 字段名
 	 * @param arr 值
-	 * @return {@link AbstraceQueryObject}
+	 * @return {@link AbstractQueryObject}
 	 */
 	public O orIn(String fieldName, Object[] arr){
 		return orIn(fieldName, Arrays.asList(arr));
