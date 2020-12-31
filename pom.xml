@@ -8,7 +8,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
-        <hibernate.version>5.4.25.Final</hibernate.version>
+        <hibernate.version>5.4.18.Final</hibernate.version>
         <hibenate.search.version>6.0.0.Final</hibenate.search.version>
         <apache.lucene.version>8.7.0</apache.lucene.version>
         <mysql.version>8.0.22</mysql.version>

@@ -1,6 +1,7 @@
 package entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class CompanyAddress extends BaseEntity {
@@ -31,5 +32,18 @@ public class CompanyAddress extends BaseEntity {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CompanyAddress that = (CompanyAddress) o;
+		return Objects.equals(company, that.company) && Objects.equals(address, that.address);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(company, address);
 	}
 }

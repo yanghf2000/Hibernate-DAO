@@ -24,9 +24,10 @@
     	
   	    		<!-- 对于关键字，自动加引号 -->
     	<property name="hibernate.auto_quote_keyword">true</property>
-    	
-    		<!-- hibernate搜索 -->
-    	<property name="hibernate.search.backend.directory.type">local-filesystem</property>
+		<property name="hibernate.globally_quoted_identifiers">true</property>
+
+		<!-- hibernate搜索 -->
+		<property name="hibernate.search.backend.directory.type">local-filesystem</property>
 		<property name="hibernate.search.backend.directory.root">d://data//hibernate-index</property>
 		<property name="hibernate.search.backend.directory.filesystem_access.strategy">auto</property>
 		<property name="hibernate.search.backend.directory.locking.strategy">native-filesystem</property>

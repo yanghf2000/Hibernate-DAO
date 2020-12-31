@@ -7,12 +7,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.yanghf2000.namingStrategy.SimplePhysicalNamingStrategy;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
-import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl;
-import org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
@@ -42,7 +40,7 @@ public class SessionFactoryUtils {
 		
 		Metadata metadata = metadataSources
 		    .getMetadataBuilder()
-		    .applyImplicitNamingStrategy(ImplicitNamingStrategyLegacyJpaImpl.INSTANCE)
+		    .applyPhysicalNamingStrategy(new SimplePhysicalNamingStrategy())
 		    .build();
 
 		sf = metadata.getSessionFactoryBuilder().build();
