@@ -11,15 +11,15 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@Indexed
+//@Indexed
 public class Category extends BaseIdEntity {
 
 	private static final long serialVersionUID = 2140769021252599177L;
 
-	@FullTextField
+//	@FullTextField
 	private String name;
 
-	@IndexedEmbedded(includeDepth = 1)
+//	@IndexedEmbedded(includeDepth = 1)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "category", orphanRemoval = true)
 	private List<ProductCategory> products;
 

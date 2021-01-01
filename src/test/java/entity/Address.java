@@ -9,7 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
 @Entity
-@Indexed
+//@Indexed
 public class Address extends BaseIdEntity{
 
 	private static final long serialVersionUID = 741793265894130462L;
@@ -24,7 +24,7 @@ public class Address extends BaseIdEntity{
 		this.street = street;
 	}
 
-	@IndexedEmbedded(/*depth = 1, */includeEmbeddedObjectId = true, includePaths = {"id", "name"})
+//	@IndexedEmbedded(/*depth = 1, */includeEmbeddedObjectId = true, includePaths = {"id", "name"})
 //	@ContainedIn
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
@@ -35,7 +35,7 @@ public class Address extends BaseIdEntity{
 	
 	private String county;
 
-	@FullTextField
+//	@FullTextField
 	private String street;
 
 	public User getUser() {

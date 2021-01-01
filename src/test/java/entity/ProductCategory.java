@@ -18,7 +18,7 @@ public class ProductCategory extends BaseEntity {
 	private Product product;
 	
 	@Id
-	@IndexedEmbedded
+//	@IndexedEmbedded
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Category category;
 

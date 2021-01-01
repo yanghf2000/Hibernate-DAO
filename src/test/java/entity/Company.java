@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Indexed
+//@Indexed
 public class Company extends BaseIdEntity{
 
 	private static final long serialVersionUID = 7417935378941308762L;
@@ -27,20 +27,21 @@ public class Company extends BaseIdEntity{
 		this.name = name;
 	}
 	
-	@FullTextField
+//	@FullTextField
 	private String name;
 	
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+//	@IndexedEmbedded(includeEmbeddedObjectId = true)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	private Address address;
-	
+
+//	@Transient
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "company")
 	private List<CompanyAddress> addresses;
 	
-	@GenericField
+//	@GenericField
 	@Enumerated(EnumType.STRING)
 	private CompanyType companyType;
 

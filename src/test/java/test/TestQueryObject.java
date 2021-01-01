@@ -125,8 +125,8 @@ public class TestQueryObject {
 		List<User> users = userDao.getQueryObject().andGe("age", 88).list();
 		System.out.println(users.size());
 		
-		List<Company> cs = companyDao.getQueryObject().andGe("user.age", 88).list();
-		System.out.println(cs.size());
+//		List<Company> cs = companyDao.getQueryObject().andGe("user.age", 88).list();
+//		System.out.println(cs.size());
 	}
 	
 	@Test

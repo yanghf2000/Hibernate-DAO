@@ -14,27 +14,27 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-@Indexed
+//@Indexed
 public class Product extends BaseIdEntity {
 
 	private static final long serialVersionUID = 3190769021252599177L;
 
-	@FullTextField
-	@GenericField(sortable = Sortable.YES)
+//	@FullTextField
+//	@GenericField(sortable = Sortable.YES)
 	private String name;
 	
-	@FullTextField
-	@Column(length = 100)
+//	@FullTextField
+//	@Column(length = 100)
 	private String subtitle;
 	
 	/**
 	 * 如果查询的比较深，则要加depth
 	 */
-	@IndexedEmbedded(includeDepth = 2)
+//	@IndexedEmbedded(includeDepth = 2)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product", orphanRemoval = false)
 	private List<ProductCategory> categories;
 	
-	@GenericField(sortable = Sortable.YES)
+//	@GenericField(sortable = Sortable.YES)
 	// 数字类型，排序 比较等用
 	// 若使用的FieldBridge实现了MetadataProvidingFieldBridge接口，则可以不用加@NumericField注解
 
@@ -47,10 +47,10 @@ public class Product extends BaseIdEntity {
 	
 	private BigDecimal price;
 	
-	@GenericField(sortable = Sortable.YES)
+//	@GenericField(sortable = Sortable.YES)
 	private LocalDate publishTime;
 	
-	@IndexedEmbedded(includeEmbeddedObjectId = true, includeDepth = 2, includePaths = {"id", "name", "user.id"})
+//	@IndexedEmbedded(includeEmbeddedObjectId = true, includeDepth = 2, includePaths = {"id", "name", "user.id"})
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Company company;
 
