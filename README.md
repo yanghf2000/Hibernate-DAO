@@ -4,7 +4,65 @@ Hibernate通用DAO
 	本项目的目的是为了方便对数据库的操作，提供了一些常用的方法。
 	在test文件夹下提供了测试方法，方便进行测试。
 	若有问题或建议可以联系我: yanghf2000@163.com
-	
+
+
+2020-12-31
+在使用新版本的hibernate search（6.0.0.Final）后，原有的影射关系不正常
+若关掉hibernate search则是正常的
+
+java.lang.ExceptionInInitializerError
+at test.TestQueryObject.<init>(TestQueryObject.java:25)
+at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:490)
+at org.junit.runners.BlockJUnit4ClassRunner.createTest(BlockJUnit4ClassRunner.java:250)
+at org.junit.runners.BlockJUnit4ClassRunner.createTest(BlockJUnit4ClassRunner.java:260)
+at org.junit.runners.BlockJUnit4ClassRunner$2.runReflectiveCall(BlockJUnit4ClassRunner.java:309)
+at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+at org.junit.runners.BlockJUnit4ClassRunner.methodBlock(BlockJUnit4ClassRunner.java:306)
+at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:69)
+at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:33)
+at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:220)
+at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:53)
+Caused by: org.hibernate.MappingException: property [company] not found on entity [entity.CompanyAddress]
+at org.hibernate.mapping.PersistentClass.getProperty(PersistentClass.java:514)
+at org.hibernate.mapping.PersistentClass.getProperty(PersistentClass.java:525)
+at org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor.resolveMappedByPath(HibernateOrmMetatadaContributor.java:219)
+at org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor.collectPropertyMetadataContributors(HibernateOrmMetatadaContributor.java:133)
+at org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor.collectPropertyDelegates(HibernateOrmMetatadaContributor.java:110)
+at org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMetatadaContributor.configure(HibernateOrmMetatadaContributor.java:66)
+at org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator.configure(AbstractPojoMappingInitiator.java:120)
+at org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator.configure(HibernateOrmMappingInitiator.java:113)
+at org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl$MappingBuildingState.collect(SearchIntegrationBuilderImpl.java:342)
+at org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl.prepareBuild(SearchIntegrationBuilderImpl.java:217)
+at org.hibernate.search.mapper.orm.bootstrap.impl.HibernateOrmIntegrationBooterImpl.doBootFirstPhase(HibernateOrmIntegrationBooterImpl.java:259)
+at org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooterBehavior.bootFirstPhase(HibernateOrmIntegrationBooterBehavior.java:17)
+at org.hibernate.search.mapper.orm.bootstrap.impl.HibernateOrmIntegrationBooterImpl.lambda$bootNow$7(HibernateOrmIntegrationBooterImpl.java:218)
+at java.base/java.util.Optional.orElseGet(Optional.java:369)
+at org.hibernate.search.mapper.orm.bootstrap.impl.HibernateOrmIntegrationBooterImpl.bootNow(HibernateOrmIntegrationBooterImpl.java:218)
+at java.base/java.util.concurrent.CompletableFuture$UniApply.tryFire(CompletableFuture.java:642)
+at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:506)
+at java.base/java.util.concurrent.CompletableFuture.complete(CompletableFuture.java:2073)
+at org.hibernate.search.mapper.orm.bootstrap.impl.HibernateSearchSessionFactoryObserver.sessionFactoryCreated(HibernateSearchSessionFactoryObserver.java:41)
+at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:382)
+at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:469)
+at util.SessionFactoryUtils.build(SessionFactoryUtils.java:46)
+at dao.BaseDao.<clinit>(BaseDao.java:31)
+... 26 more
 
 2019-12-4
 测试映射map的情形
