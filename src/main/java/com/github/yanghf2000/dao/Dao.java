@@ -144,7 +144,7 @@ public abstract class Dao<T> {
      * @return the generated identifier 返回生成的主键
      */
     public Serializable save(T t) {
-        return getSession().save(t);
+        return (Serializable) getSession().save(t);
     }
 
     /**
@@ -616,6 +616,7 @@ public abstract class Dao<T> {
 
     /**
      * 执行查询，要传入映射结果类型
+     * 该方法用6.0.0.Alpha的包后进行了改变，sql要与注解放在一起，既然这样，不用单独写，这里就不需要了
      * @param resultSetMapping	影射的结果类型, 可以参数User上面的ResultSetMapping，具体见Hibernate说明书
      * @param sql						要执行的sql
      * @param first						查询起始位置
@@ -623,7 +624,7 @@ public abstract class Dao<T> {
      * @param objects					参数
      * @return
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    /*@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <E> List<E> findBySqlUseResultMapping(String resultSetMapping, String sql, Integer first, Integer size, Object... objects) {
         NativeQuery query = getSession().createNativeQuery(sql);
 
@@ -636,8 +637,8 @@ public abstract class Dao<T> {
         setLimitProperty(query, first, size);
 
         return query.getResultList();
-    }
-    
+    }*/
+
     /**
      * 取得一个查询对象
      * @return {@link QueryObject}

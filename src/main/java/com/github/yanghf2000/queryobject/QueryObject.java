@@ -2,8 +2,10 @@ package com.github.yanghf2000.queryobject;
 
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
+import org.hibernate.SortOrder;
 import org.hibernate.query.Query;
-import org.hibernate.query.criteria.internal.OrderImpl;
+import org.hibernate.query.sqm.tree.expression.SqmExpression;
+import org.hibernate.query.sqm.tree.select.SqmSortSpecification;
 
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.*;
@@ -147,7 +149,8 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 */
 	public QueryObject<T> orderAsc(String fieldName){
 		Path path = extractPath(fieldName);
-		orders.add(new OrderImpl(path, true));
+//		orders.add(new OrderImpl(extractPath(fieldName), true));
+		orders.add(new SqmSortSpecification((SqmExpression) path, SortOrder.ASCENDING));
 		return this;
 	}
 	
@@ -157,7 +160,8 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 * @return {@link QueryObject}
 	 */
 	public QueryObject<T> orderDesc(String fieldName){
-		orders.add(new OrderImpl(extractPath(fieldName), false));
+//		orders.add(new OrderImpl(extractPath(fieldName), false));
+		orders.add(new SqmSortSpecification((SqmExpression) extractPath(fieldName), SortOrder.DESCENDING));
 		return this;
 	}
 	

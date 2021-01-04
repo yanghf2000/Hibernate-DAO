@@ -513,11 +513,11 @@ public class TestDao {
     	});
     }
 
-    @Test
+   /* @Test
 	public void findBySqlUseResultMapping() {
         List<UserVo> list = userDao.findBySqlUseResultMapping("user_dto", "select id, name, age from User u where u.id < ?", 0, 3, 15L);
         System.out.println(list.size());
-    }
+    }*/
     
     @Test
     public void getOne() {
