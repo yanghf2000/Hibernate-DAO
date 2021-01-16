@@ -14,23 +14,21 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-//@Indexed
+@Indexed
 public class Product extends BaseIdEntity {
 
 	private static final long serialVersionUID = 3190769021252599177L;
 
-//	@FullTextField
-//	@GenericField(sortable = Sortable.YES)
+	@FullTextField
 	private String name;
 	
-//	@FullTextField
-//	@Column(length = 100)
+	@FullTextField
 	private String subtitle;
 	
 	/**
 	 * 如果查询的比较深，则要加depth
 	 */
-//	@IndexedEmbedded(includeDepth = 2)
+	@IndexedEmbedded(includeDepth = 2)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product", orphanRemoval = false)
 	private List<ProductCategory> categories;
 	

@@ -30,7 +30,7 @@ import java.util.Set;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-//@Indexed
+@Indexed
 public class User extends BaseIdEntity implements Comparable<User>{
 
 	private static final long serialVersionUID = 741793537894130462L;
@@ -51,23 +51,22 @@ public class User extends BaseIdEntity implements Comparable<User>{
 		this.age = age;
 	}
 
-//	@FullTextField
-//	@GenericField(sortable = Sortable.YES)
+	@FullTextField()
 	private String name;
 
-//	@GenericField(sortable = Sortable.YES)
+	@GenericField(sortable = Sortable.YES)
 	private int age;
 
-//	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.STRING)
 	private Sex sex;
 	
-//	@GenericField(sortable = Sortable.YES)
+	@GenericField(sortable = Sortable.YES)
 	private LocalDate birthday;
 
-//	@FullTextField
+	@FullTextField
 	private String info;
 
-//	@GenericField(sortable = Sortable.YES)
+	@GenericField(sortable = Sortable.YES)
 	private BigDecimal property;
 
 	// includePaths 写出要查询的字段，这个可以不加，但如果加了，对方类的字段上必须加上@Field注解

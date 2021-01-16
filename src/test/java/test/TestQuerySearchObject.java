@@ -34,13 +34,6 @@ public class TestQuerySearchObject {
 	
 	private boolean commit = true;
 
-	@Test
-	public void test()  {
-		UserDao userDao = new UserDao();
-		User user = (User) userDao.get(1L);
-		System.out.println(user);
-	}
-	
 	@Before
 	public void before() throws InterruptedException {
 		sf = SessionFactoryUtils.build();
