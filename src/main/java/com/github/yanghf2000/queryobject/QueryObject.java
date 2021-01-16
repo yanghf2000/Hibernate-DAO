@@ -2,10 +2,8 @@ package com.github.yanghf2000.queryobject;
 
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
-import org.hibernate.SortOrder;
 import org.hibernate.query.Query;
-import org.hibernate.query.sqm.tree.expression.SqmExpression;
-import org.hibernate.query.sqm.tree.select.SqmSortSpecification;
+import org.hibernate.query.criteria.internal.OrderImpl;
 
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.*;
@@ -68,8 +66,9 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 * @return {@link CriteriaQuery}
 	 */
 	private CriteriaQuery<T> getAnyFieldsCriteriaQuery(String... fields){
-		if(fields == null || fields.length < 1)
+		if(fields == null || fields.length < 1) {
 			throw new IllegalArgumentException("要查询的字段不能为空");
+		}
 		
 		Selection[] arrs = new Selection[fields.length];
 		for(int i = 0; i < fields.length; i++){
@@ -87,8 +86,9 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 */
 	private CriteriaQuery<T> getCountCriteriaQuery(String field, boolean distinct){
 		Expression<T> exp = root;
-		if(field != null && !"".equals(field))
+		if(field != null && !"".equals(field)) {
 			exp = extractPath(field);
+		}
 		
 		this.criteria.select(distinct ? builder.countDistinct(exp) : builder.count(exp));
 		return getCriteriaQuery();
@@ -149,8 +149,8 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 */
 	public QueryObject<T> orderAsc(String fieldName){
 		Path path = extractPath(fieldName);
-//		orders.add(new OrderImpl(extractPath(fieldName), true));
-		orders.add(new SqmSortSpecification((SqmExpression) path, SortOrder.ASCENDING));
+		orders.add(new OrderImpl(extractPath(fieldName), true));
+//		orders.add(new SqmSortSpecification((SqmExpression) path, SortOrder.ASCENDING));
 		return this;
 	}
 	
@@ -160,8 +160,8 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 * @return {@link QueryObject}
 	 */
 	public QueryObject<T> orderDesc(String fieldName){
-//		orders.add(new OrderImpl(extractPath(fieldName), false));
-		orders.add(new SqmSortSpecification((SqmExpression) extractPath(fieldName), SortOrder.DESCENDING));
+		orders.add(new OrderImpl(extractPath(fieldName), false));
+//		orders.add(new SqmSortSpecification((SqmExpression) extractPath(fieldName), SortOrder.DESCENDING));
 		return this;
 	}
 	
@@ -308,8 +308,9 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 */
 	public <E>QueryObject<T> wrapper(Class<E> resultClass, String... fields){
 		Objects.requireNonNull(resultClass, "结果对象类不能为null!");
-		if(fields == null || fields.length < 1)
+		if(fields == null || fields.length < 1) {
 			throw new IllegalArgumentException("字段不能为空!");
+		}
 		
 		Selection[] arrs = new Selection[fields.length];
 		for(int i = 0; i < fields.length; i++){
@@ -521,11 +522,12 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	 * @param query
 	 */
 	private void addLock(Query query) {
-		if(lockOptions != null) 
+		if(lockOptions != null) {
 			query.setLockOptions(lockOptions);
-		else {
-			if(lockModeType != null)
+		} else {
+			if(lockModeType != null) {
 				query.setLockMode(lockModeType);
+			}
 		}
 	}
 	

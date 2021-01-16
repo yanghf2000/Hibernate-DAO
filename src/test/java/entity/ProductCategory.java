@@ -1,24 +1,22 @@
 package entity;
 
+import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class ProductCategory extends BaseEntity {
+public class ProductCategory extends BaseIdEntity {
 
 	private static final long serialVersionUID = 2140849021252599177L;
 
-	@Id
+//	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Product product;
 	
-	@Id
-//	@IndexedEmbedded
+//	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Category category;
 
@@ -50,4 +48,5 @@ public class ProductCategory extends BaseEntity {
 	public int hashCode() {
 		return Objects.hash(product, category);
 	}
+
 }

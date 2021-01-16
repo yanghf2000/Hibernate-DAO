@@ -5,6 +5,28 @@ Hibernate通用DAO
 	在test文件夹下提供了测试方法，方便进行测试。
 	若有问题或建议可以联系我: yanghf2000@163.com
 
+2021-1-16
+经测试，是由于一些多对多的表没有主键造成的，如下：
+@Id
+@ManyToOne(fetch = FetchType.LAZY)
+private Product product;
+
+@Id
+@ManyToOne(fetch = FetchType.LAZY)
+private Category category;
+
+解决方法：将联合主键注释，加上独立的id就行
+
+@Id
+private Long id;
+
+//	@Id
+@ManyToOne(fetch = FetchType.LAZY)
+private Product product;
+
+//	@Id
+@ManyToOne(fetch = FetchType.LAZY)
+private Category category;
 
 2020-12-31
 在使用新版本的hibernate search（6.0.0.Final）后，原有的影射关系不正常
