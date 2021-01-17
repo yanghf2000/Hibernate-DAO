@@ -32,6 +32,7 @@
 		<property name="hibernate.search.backend.directory.root">d://data//hibernate-index</property>
 		<property name="hibernate.search.backend.directory.filesystem_access.strategy">auto</property>
 		<property name="hibernate.search.backend.directory.locking.strategy">native-filesystem</property>
+		<property name="hibernate.search.backend.analysis.configurer">analyter.AnalysisConfigurer</property>
 
     </session-factory>
 </hibernate-configuration>

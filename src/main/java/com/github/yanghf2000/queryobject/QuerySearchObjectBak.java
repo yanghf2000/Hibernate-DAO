@@ -3,7 +3,6 @@ package com.github.yanghf2000.queryobject;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SortField;
 import org.hibernate.Session;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -21,8 +20,8 @@ import java.util.*;
  * 2018-1-12
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class QuerySearchObject<T>{
-	
+public class QuerySearchObjectBak<T>{
+
 	private SearchSession searchSession;
 	private Class<T> clazz;
 	private Set<String> joinFields = new HashSet<>();
@@ -34,17 +33,17 @@ public class QuerySearchObject<T>{
 	private List<MatchPredicateOptionsStep> queries = new ArrayList<>();
 
 	private List<SortField> sortFields = new ArrayList<>();
-	
+
 	// 和求距离相关
 	private String distanceField;
 	private Double centerLongitude = null, centerLatitude = null;
-	
-	public static <T>QuerySearchObject<T> getInstance(Session session, Class<T> clazz){
-		return new QuerySearchObject(session, clazz);
+
+	public static <T> QuerySearchObjectBak<T> getInstance(Session session, Class<T> clazz){
+		return new QuerySearchObjectBak(session, clazz);
 	}
-	
+
 	@SuppressWarnings("deprecation")
-	private QuerySearchObject(Session session, Class<T> clazz){
+	private QuerySearchObjectBak(Session session, Class<T> clazz){
 		this.searchSession = Search.session(session);
 		this.clazz = clazz;
 		scope = searchSession.scope(clazz);
@@ -59,9 +58,9 @@ public class QuerySearchObject<T>{
 	 * So far we have been looking for words or sets of words, you can also search exact or approximate sentences. Use phrase() to do so<br>
 	 * @param fieldName 字段名
 	 * @param value 值
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sentence(String fieldName, Object value){
+	public QuerySearchObjectBak<T> sentence(String fieldName, Object value){
 		needJoinTable(fieldName);
 		
 		String val = value + "";
@@ -92,7 +91,7 @@ public class QuerySearchObject<T>{
 	 * @param min
 	 * @param max
 	 */
-	public QuerySearchObject<T> range(String fieldName, Object min, Object max){
+	public QuerySearchObjectBak<T> range(String fieldName, Object min, Object max){
 		return range(fieldName, min, max, null);
 	}
 
@@ -102,7 +101,7 @@ public class QuerySearchObject<T>{
 	 * @param max
 	 * @param fieldNames
 	 */
-	public QuerySearchObject<T> range(Object min, Object max, String... fieldNames){
+	public QuerySearchObjectBak<T> range(Object min, Object max, String... fieldNames){
 		return range(min, max, null, fieldNames);
 	}
 
@@ -113,7 +112,7 @@ public class QuerySearchObject<T>{
 	 * @param max
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 */
-	public QuerySearchObject<T> range(String fieldName, Object min, Object max, Class type){
+	public QuerySearchObjectBak<T> range(String fieldName, Object min, Object max, Class type){
 		needJoinTable(fieldName);
 //		queries.add(qb.range().onField(fieldName).from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
 		return this;
@@ -126,7 +125,7 @@ public class QuerySearchObject<T>{
 	 * @param max
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 */
-	public QuerySearchObject<T> range(Object min, Object max, Class type, String... fieldNames){
+	public QuerySearchObjectBak<T> range(Object min, Object max, Class type, String... fieldNames){
 
 		scope.predicate().range().fields(fieldNames).between(min, max);
 
@@ -152,7 +151,7 @@ public class QuerySearchObject<T>{
 	 * @param value
 	 * @return
 	 */
-	public QuerySearchObject<T> above(String fieldName, Object value){
+	public QuerySearchObjectBak<T> above(String fieldName, Object value){
 		return above(fieldName, value, null);
 	}
 	
@@ -163,7 +162,7 @@ public class QuerySearchObject<T>{
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 * @return
 	 */
-	public QuerySearchObject<T> above(String fieldName, Object value, Class type){
+	public QuerySearchObjectBak<T> above(String fieldName, Object value, Class type){
 		needJoinTable(fieldName);
 //		queries.add(qb.range().onField(fieldName).above(typeConver(value, type)).createQuery());
 		return this;
@@ -175,7 +174,7 @@ public class QuerySearchObject<T>{
 	 * @param value
 	 * @return
 	 */
-	public QuerySearchObject<T> below(String fieldName, Object value){
+	public QuerySearchObjectBak<T> below(String fieldName, Object value){
 		return below(fieldName, value, null);
 	}
 	
@@ -186,7 +185,7 @@ public class QuerySearchObject<T>{
 	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
 	 * @return
 	 */
-	public QuerySearchObject<T> below(String fieldName, Object value, Class type){
+	public QuerySearchObjectBak<T> below(String fieldName, Object value, Class type){
 		needJoinTable(fieldName);
 //		queries.add(qb.range().onField(fieldName).below(typeConver(value, type)).createQuery());
 		return this;
@@ -221,12 +220,17 @@ public class QuerySearchObject<T>{
 	 * @param fieldNames
 	 * @return
 	 */
-	public QuerySearchObject<T> match(Object value, String... fieldNames){
+	public QuerySearchObjectBak<T> match(Object value, String... fieldNames){
+		// 这个只是添加联表用的
+    	/*for(String s : fieldNames) {
+			needJoinTable(s);
+		}*/
+    	
     	if(value instanceof String && value.toString().contains(" ")) {
     		return match(value.toString().split(" "), fieldNames);
     	}
 
-		queries.add(scope.predicate().match().fields(fieldNames).matching(value, ValueConvert.NO));
+		queries.add(scope.predicate().match().fields(fieldNames).matching(value));
     	
 //    	queries.add(qb.keyword().onFields(fieldNames).matching(value).createQuery());
 		return this;
@@ -238,9 +242,9 @@ public class QuerySearchObject<T>{
 	 * @param fieldNames
 	 * @return
 	 */
-//	public QuerySearchObject<T> match(Object[] values, String... fieldNames){
-//		return match(Arrays.asList(values), fieldNames);
-//	}
+	public QuerySearchObjectBak<T> match(Object[] values, String... fieldNames){
+		return match(Arrays.asList(values), fieldNames);
+	}
 	
 	/**
 	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这种针对的是多个值的情况下，比如枚举或对象，不能像空格那样拼写的
@@ -248,20 +252,20 @@ public class QuerySearchObject<T>{
 	 * @param fieldNames
 	 * @return
 	 */
-//	public QuerySearchObject<T> match(Collection values, String... fieldNames){
-//		// 这个只是添加联表用的
-//		for(String s : Objects.requireNonNull(fieldNames))  {
-//			needJoinTable(s);
+	public QuerySearchObjectBak<T> match(Collection values, String... fieldNames){
+		// 这个只是添加联表用的
+		for(String s : Objects.requireNonNull(fieldNames))  {
+			needJoinTable(s);
+		}
+		
+//		BooleanJunction<BooleanJunction> bool = qb.bool();
+//		for(Object v : Objects.requireNonNull(values)) {
+//			bool.should(qb.keyword().onFields(fieldNames).matching(v).createQuery());
 //		}
 //
-////		BooleanJunction<BooleanJunction> bool = qb.bool();
-////		for(Object v : Objects.requireNonNull(values)) {
-////			bool.should(qb.keyword().onFields(fieldNames).matching(v).createQuery());
-////		}
-////
-////		queries.add(bool.createQuery());
-//		return this;
-//	}
+//		queries.add(bool.createQuery());
+		return this;
+	}
 	
 	/**
 	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这个一般是匹配单个字符，加上*号
@@ -269,7 +273,7 @@ public class QuerySearchObject<T>{
 	 * @param fieldNames
 	 * @return
 	 */
-	public QuerySearchObject<T> wildcardMatch(Object value, String... fieldNames){
+	public QuerySearchObjectBak<T> wildcardMatch(Object value, String... fieldNames){
 		// 这个只是添加联表用的
 //		for(String s : fieldNames)
 //			needJoinTable(s);
@@ -281,9 +285,9 @@ public class QuerySearchObject<T>{
 	/**
 	 * 关联表
 	 * @param fields
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> join(String... fields){
+	public QuerySearchObjectBak<T> join(String... fields){
 		// 这个是添加联表用的，和上面的代码不冲突
 		for(String s : fields) {
 			if(!s.contains(".")) {
@@ -324,9 +328,9 @@ public class QuerySearchObject<T>{
 	/**
 	 * 排序, 默认按自然排序
 	 * @param field 要排序的字段，要加上@SortableField注解
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sort(String field){
+	public QuerySearchObjectBak<T> sort(String field){
 		return sort(field, false);
 	}
 	
@@ -334,9 +338,9 @@ public class QuerySearchObject<T>{
 	 * 排序
 	 * @param field 要排序的字段，要加上@SortableField注解
 	 * @param reverse 是否倒序
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sort(String field, boolean reverse){
+	public QuerySearchObjectBak<T> sort(String field, boolean reverse){
 		return sort(field, SortField.Type.STRING, reverse);
 	}
 	
@@ -357,9 +361,9 @@ public class QuerySearchObject<T>{
 	 * 		BYTES			Sort use byte[] index values.<br>
 	 * 		REWRITEABLE	Force rewriting of SortField using {@link SortField#rewrite(IndexSearcher)} before it can be used for sorting<br>
 	 * @param reverse 是否倒序
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sort(String field, SortField.Type type, boolean reverse){
+	public QuerySearchObjectBak<T> sort(String field, SortField.Type type, boolean reverse){
 		if(field != null && !"".equals(field.trim())) {
 			sortFields.add(new SortField(field, type, reverse));
 		}
@@ -373,25 +377,25 @@ public class QuerySearchObject<T>{
 	 * @param type 要排序的字段的类型，默认为STRING <br>
 	 * @return
 	 */
-	public QuerySearchObject<T> sort(String field, SortField.Type type){
+	public QuerySearchObjectBak<T> sort(String field, SortField.Type type){
 		return sort(field, type, false);
 	}
 	
 	/**
 	 * 距离排序
 	 * @param field Coordinates
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sortDistance(String field){
+	public QuerySearchObjectBak<T> sortDistance(String field){
 		return sortDistance(field, false);
 	}
 	
 	/**
 	 * 距离排序
 	 * @param field 获取Coordinates
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sortDistance(String field, boolean reverse){
+	public QuerySearchObjectBak<T> sortDistance(String field, boolean reverse){
 		if(centerLatitude == null && centerLongitude == null) {
 			throw new IllegalArgumentException("经纬度不能为null!");
 		}
@@ -404,9 +408,9 @@ public class QuerySearchObject<T>{
 	 * @param field Coordinates
 	 * @param centerLongitude 经度 
 	 * @param centerLatitude 纬度
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sortDistance(String field, double centerLongitude, double centerLatitude){
+	public QuerySearchObjectBak<T> sortDistance(String field, double centerLongitude, double centerLatitude){
 		return sortDistance(field, centerLongitude, centerLatitude, false);
 	}
 	
@@ -416,9 +420,9 @@ public class QuerySearchObject<T>{
 	 * @param centerLongitude 经度 
 	 * @param centerLatitude 纬度
 	 * @param reverse 是否倒序
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> sortDistance(String field, Double centerLongitude, Double centerLatitude, boolean reverse){
+	public QuerySearchObjectBak<T> sortDistance(String field, Double centerLongitude, Double centerLatitude, boolean reverse){
 //		sortFields.add(new DistanceSortField(centerLatitude, centerLongitude, field, reverse));
 		
 		setDistanceFields(field, centerLongitude, centerLatitude);
@@ -465,9 +469,9 @@ public class QuerySearchObject<T>{
 	 * @param distanceInKilometers 距离
 	 * @param centerLongitude 经度	Longitude values must be in the range (-180, 180]. Positive values are east of the prime meridian.
 	 * @param centerLatitude 纬度 Latitude values must be in the range [-90, 90]. Positive values are north of the equator.
-	 * @return {@link QuerySearchObject}
+	 * @return {@link QuerySearchObjectBak}
 	 */
-	public QuerySearchObject<T> distance(double distanceInKilometers, double centerLongitude, double centerLatitude){
+	public QuerySearchObjectBak<T> distance(double distanceInKilometers, double centerLongitude, double centerLatitude){
 		if(distanceInKilometers < 0) {
 			throw new IllegalArgumentException("距离不能为负数!");
 		}
@@ -582,10 +586,6 @@ public class QuerySearchObject<T>{
 //				.fetchHits( 20 );
 
 		SearchScope<T> scope = searchSession.scope(clazz);
-
-		pageNo = pageNo == null ? 0 : pageNo;
-		pageSize = pageSize == null ? Integer.MAX_VALUE : pageSize;
-		pageNo = pageNo * pageSize;
 		SearchResult<T> searchResult = searchSession.search(clazz).where(f -> {
 			if(queries.isEmpty()) {
 				return f.matchAll();
@@ -596,7 +596,7 @@ public class QuerySearchObject<T>{
 				bool = bool.must(query);
 			}
 			return bool;
-		}).fetch(pageNo, pageSize);
+		}).fetch((pageNo - 1) * pageSize, pageSize);
 
 		this.count = searchResult.total().hitCount();
 		List<T> results = searchResult.hits();
@@ -616,8 +616,7 @@ public class QuerySearchObject<T>{
 //    		hibQuery.setSpatialParameters(centerLatitude, centerLongitude, field);
 //    	}
 //
-
-		Map<String, Object> map = new HashMap<>();
+    	Map<String, Object> map = new HashMap<>();
 //    	this.count = hibQuery.getResultSize();
 //    	// 这一句只能话在前面，如果先获取了List，再获取数量则会报错
     	map.put("count", count);

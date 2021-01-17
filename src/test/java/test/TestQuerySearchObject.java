@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import util.SessionFactoryUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -55,7 +56,112 @@ public class TestQuerySearchObject {
 		if(ss != null && ss.isOpen())
 			ss.close();
 	}
-	
+
+	/**
+	 * 查询所有
+	 */
+	@Test
+	public void testMatchAll() {
+		List<User> list = userDao.getQuerySearchObject().list(1, 2);
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getName()));
+	}
+
+	/**
+	 * 查询指定字段
+	 */
+	@Test
+	public void testMatchNull() {
+		List<User> list = userDao.getQuerySearchObject().match("", "name_1").list();
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getName()));
+
+//		List<User> list = userDao.getQuerySearchObject().match(BigDecimal.valueOf(-1), "property").list();
+//		System.out.println(list.size());
+//		list.forEach(e -> System.out.println(e.getName()));
+	}
+
+	/**
+	 * 查询指定字段
+	 */
+	@Test
+	public void testMatch1() {
+		List<User> list = userDao.getQuerySearchObject().match("on", "name").list();
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getName()));
+	}
+
+	/**
+	 * 中文查询
+	 */
+	@Test
+	public void testMatch2() {
+		List<User> list = userDao.getQuerySearchObject().match("茅台", "name").list();
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getName()));
+	}
+
+	/**
+	 * 中文查询
+	 */
+	@Test
+	public void testMatch3() {
+		List<User> list = userDao.getQuerySearchObject().match("龙华区", "addresses.street").list();
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getName()));
+	}
+
+	/**
+	 * 匹配
+	 */
+	@Test
+	public void testMatch3111() {
+
+
+
+
+
+		// 使用match，只要有一个词匹配上就算查到的结果
+/*		List<Product> list = productDao.getQuerySearchObject().match("坏不了的手机", "subtitle").list(0, 20);
+		System.out.println(list.size());
+		list.forEach(p -> System.out.println(String.format("id: %d, name: %s, subtitle: %s", p.getId(), p.getName(), p.getSubtitle())));
+
+		List<Product> list1 = productDao.getQuerySearchObject().match("手机", "subtitle").list(0, 20);
+		System.out.println(list1.size());
+		list1.forEach(p -> System.out.println(String.format("id: %d, name: %s, subtitle: %s", p.getId(), p.getName(), p.getSubtitle())));
+
+		// 用user.id查不到结果
+		List<Address> list2 = addressDao.getQuerySearchObject().match("是", "street").sentence("user.name", "工有").sentence("user.id", 10).list(0, 20);
+		System.out.println(list2.size());
+		list2.forEach(a -> System.out.println(String.format("id: %d, street: %s, userId: %d, username: %s", a.getId(), a.getStreet(), a.getUser().getId(), a.getUser().getName())));
+*/
+
+		List<User> list = userDao.getQuerySearchObject().match("茅台", "name").list();
+		System.out.println(list.size());
+		if(list.size() > 0){
+			System.out.println(list.get(0).getName());
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
 	 * 较为精确的匹配
 	 */
@@ -119,33 +225,6 @@ public class TestQuerySearchObject {
 		// 用sentence这样执行失败
 //		List<Product> list2 = productDao.getQuerySearchObject().sentence("company.user", new User(1L)).list();
 //		System.out.println(list2.size());
-	}
-	
-	/**
-	 * 匹配
-	 */
-	@Test
-	public void testMatch() {
-		// 使用match，只要有一个词匹配上就算查到的结果
-/*		List<Product> list = productDao.getQuerySearchObject().match("坏不了的手机", "subtitle").list(0, 20);
-		System.out.println(list.size());
-		list.forEach(p -> System.out.println(String.format("id: %d, name: %s, subtitle: %s", p.getId(), p.getName(), p.getSubtitle())));
-		
-		List<Product> list1 = productDao.getQuerySearchObject().match("手机", "subtitle").list(0, 20);
-		System.out.println(list1.size());
-		list1.forEach(p -> System.out.println(String.format("id: %d, name: %s, subtitle: %s", p.getId(), p.getName(), p.getSubtitle())));
-		
-		// 用user.id查不到结果
-		List<Address> list2 = addressDao.getQuerySearchObject().match("是", "street").sentence("user.name", "工有").sentence("user.id", 10).list(0, 20);
-		System.out.println(list2.size());
-		list2.forEach(a -> System.out.println(String.format("id: %d, street: %s, userId: %d, username: %s", a.getId(), a.getStreet(), a.getUser().getId(), a.getUser().getName())));
-*/
-		
-		List<User> list = userDao.getQuerySearchObject().match("茅台", "name").list();
-		System.out.println(list.size());
-		if(list.size() > 0){
-			System.out.println(list.get(0).getName());
-		}
 	}
 	
 	/**

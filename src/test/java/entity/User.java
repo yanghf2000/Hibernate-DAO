@@ -5,10 +5,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 import vo.UserVo;
 
 import javax.persistence.*;
@@ -51,12 +48,14 @@ public class User extends BaseIdEntity implements Comparable<User>{
 		this.age = age;
 	}
 
-	@FullTextField()
+	@FullTextField(analyzer = "chinese")
+	@GenericField(name = "name_1", indexNullAs = "")
 	private String name;
 
 	@GenericField(sortable = Sortable.YES)
 	private int age;
 
+	@GenericField
 	@Enumerated(EnumType.STRING)
 	private Sex sex;
 	
@@ -66,7 +65,7 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@FullTextField
 	private String info;
 
-	@GenericField(sortable = Sortable.YES)
+	@ScaledNumberField(sortable = Sortable.YES, indexNullAs = "-1")
 	private BigDecimal property;
 
 	// includePaths 写出要查询的字段，这个可以不加，但如果加了，对方类的字段上必须加上@Field注解
@@ -76,7 +75,7 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	// Circular reference. Entity entity.Address was already encountered,
 	// and was encountered again in entity entity.User at path 'user.addresses.'.
 	// Set the @IndexedEmbedded.depth value explicitly to fix the problem.
-//	@IndexedEmbedded(depth = 1)
+	@IndexedEmbedded(includeDepth = 1)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<Address> addresses;
 

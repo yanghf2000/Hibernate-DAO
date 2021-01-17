@@ -1,6 +1,7 @@
 package entity;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
@@ -28,14 +29,17 @@ public class Address extends BaseIdEntity{
 //	@ContainedIn
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
-	
+
+	@GenericField
 	private String province;
-	
+
+	@GenericField
 	private String city;
-	
+
+	@GenericField
 	private String county;
 
-//	@FullTextField
+	@FullTextField(analyzer = "chinese")
 	private String street;
 
 	public User getUser() {
