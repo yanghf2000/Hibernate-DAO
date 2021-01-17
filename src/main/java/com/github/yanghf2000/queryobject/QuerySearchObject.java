@@ -587,7 +587,7 @@ public class QuerySearchObject<T>{
 		pageSize = pageSize == null ? Integer.MAX_VALUE : pageSize;
 		pageNo = pageNo * pageSize;
 		SearchResult<T> searchResult = searchSession.search(clazz).where(f -> {
-			if(queries.isEmpty()) {
+			/*if(queries.isEmpty()) {
 				return f.matchAll();
 			}
 
@@ -595,7 +595,12 @@ public class QuerySearchObject<T>{
 			for (MatchPredicateOptionsStep query : queries) {
 				bool = bool.must(query);
 			}
-			return bool;
+			return bool;*/
+
+			// 查null值
+			return f.bool().mustNot(f.exists().field("name"));
+
+//			return f.exists().field("name");
 		}).fetch(pageNo, pageSize);
 
 		this.count = searchResult.total().hitCount();
