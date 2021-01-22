@@ -444,7 +444,8 @@ public class TestDao {
     }
     
     // ******************** 统计 count *****************
-    
+
+
     @Test
     public void countByHql() {
     	String hql = "from Address a where a.id < ?0";
