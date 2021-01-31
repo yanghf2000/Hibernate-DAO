@@ -5,11 +5,9 @@
 <hibernate-configuration>
     <session-factory>
 				<!-- 已过期 -->
-<!--    	<property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>-->
-    	<property name="hibernate.dialect.storage_engine">innodb</property>
+    	<property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
 
     	<property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-<!--    	<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate_test?useSSL=false%26serverTimezone=GMT%2B8</property>-->
     	<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate_test?serverTimezone=GMT</property>
     	<property name="hibernate.connection.username">root</property>
     	<property name="hibernate.connection.password">123456</property>
@@ -32,7 +30,7 @@
 		<property name="hibernate.search.backend.directory.root">d://data//hibernate-index</property>
 		<property name="hibernate.search.backend.directory.filesystem_access.strategy">auto</property>
 		<property name="hibernate.search.backend.directory.locking.strategy">native-filesystem</property>
-		<property name="hibernate.search.backend.analysis.configurer">analyter.AnalysisConfigurer</property>
+		<property name="hibernate.search.backend.analysis.configurer">analyzer.AnalysisConfigurer</property>
 
     </session-factory>
 </hibernate-configuration>

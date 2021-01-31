@@ -1,4 +1,4 @@
-package analyter;
+package analyzer;
 
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationContext;

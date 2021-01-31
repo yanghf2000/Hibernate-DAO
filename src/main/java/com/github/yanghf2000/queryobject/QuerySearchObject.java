@@ -1,17 +1,22 @@
 package com.github.yanghf2000.queryobject;
 
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.SortField;
 import org.hibernate.Session;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.graph.GraphSemantic;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
-import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
+import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
+import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import java.lang.reflect.Field;
+import javax.persistence.AttributeNode;
+import javax.persistence.EntityGraph;
+import javax.persistence.Subgraph;
 import java.util.*;
 
 /**
@@ -31,14 +36,21 @@ public class QuerySearchObject<T>{
 	/**
 	 * 查询条件
 	 */
-	private List<MatchPredicateOptionsStep> queries = new ArrayList<>();
+	private List<PredicateFinalStep> predicateSteps = new ArrayList<>();
 
-	private List<SortField> sortFields = new ArrayList<>();
-	
+	/**
+	 * 排序
+	 */
+	private SortThenStep sortStep;
+
+	/**
+	 * 关联表用
+	 */
+	private EntityGraph graph;
+
 	// 和求距离相关
-	private String distanceField;
 	private Double centerLongitude = null, centerLatitude = null;
-	
+
 	public static <T>QuerySearchObject<T> getInstance(Session session, Class<T> clazz){
 		return new QuerySearchObject(session, clazz);
 	}
@@ -48,6 +60,7 @@ public class QuerySearchObject<T>{
 		this.searchSession = Search.session(session);
 		this.clazz = clazz;
 		scope = searchSession.scope(clazz);
+		graph = searchSession.toEntityManager().createEntityGraph(clazz);
 	}
 	
 	// ********************************** 以下为添加条件 ********************************
@@ -61,39 +74,24 @@ public class QuerySearchObject<T>{
 	 * @param value 值
 	 * @return {@link QuerySearchObject}
 	 */
+	@Deprecated
 	public QuerySearchObject<T> sentence(String fieldName, Object value){
-		needJoinTable(fieldName);
-		
-		String val = value + "";
-		
-		Field field = null;
-		try {
-			// TODO 这里有一个bug，如果是子类的话，field会获取不到
-			field = clazz.getDeclaredField(fieldName);
-		} catch (NoSuchFieldException | SecurityException e) {
-			e.printStackTrace();
-		}
-//		Annotation[] annotations = field.getAnnotations();
-//		for(Annotation a : annotations){
-//			if(a.annotationType() == FieldBridge.class){
-//				FieldBridge fb = (FieldBridge)a;
-//				if(fb.impl() == DateTimeFieldBridge.class)
-//					val = DateTimeFieldBridge.toKey(value);
-//			}
-//		}
-//
-//		queries.add(qb.phrase().onField(fieldName).sentence(val).createQuery());
+//		queries.add(scope.predicate().phrase().fields(fieldName).matching(null));
 		return this;
 	}
 
 	/**
-	 * 范围条件， 默认搜索String类型的，其他类型的搜索不到，要指明类型<br>
-	 * @param fieldName
-	 * @param min
-	 * @param max
+	 * phrase，字段要包含（给定顺序的）分词，须是加了@FullTextField注解的
+	 * 比如：字段是：小米手机 value 小米 手机，小米手机，小米，手机都能查到，但手机小米查不到，顺序不对
+	 * The phrase predicate matches documents for which a given field contains a given sequence of words, in the given order.
+	 * @param value 值
+	 * @param fieldNames 字段名
+	 * @return {@link QuerySearchObject}
 	 */
-	public QuerySearchObject<T> range(String fieldName, Object min, Object max){
-		return range(fieldName, min, max, null);
+	public QuerySearchObject<T> phrase(String value, String... fieldNames){
+		// slop：中间可包含的词，如：a b, a x x b都是可以查到的
+		predicateSteps.add(scope.predicate().phrase().fields(fieldNames).matching(value)/*.slop(2)*/);
+		return this;
 	}
 
 	/**
@@ -103,178 +101,97 @@ public class QuerySearchObject<T>{
 	 * @param fieldNames
 	 */
 	public QuerySearchObject<T> range(Object min, Object max, String... fieldNames){
-		return range(min, max, null, fieldNames);
-	}
-
-	/**
-	 * 范围条件<br>
-	 * @param fieldName
-	 * @param min
-	 * @param max
-	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
-	 */
-	public QuerySearchObject<T> range(String fieldName, Object min, Object max, Class type){
-		needJoinTable(fieldName);
-//		queries.add(qb.range().onField(fieldName).from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
-		return this;
-	}
-
-	/**
-	 * 范围条件<br>
-	 * @param fieldNames
-	 * @param min
-	 * @param max
-	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
-	 */
-	public QuerySearchObject<T> range(Object min, Object max, Class type, String... fieldNames){
-
-		scope.predicate().range().fields(fieldNames).between(min, max);
-
-//		RangeMatchingContext rangeMatchingContext = null;
-//		for(int i = 0; i < fieldNames.length; i++) {
-//			String fieldName = fieldNames[i];
-//			needJoinTable(fieldName);
-//			if(i == 0) {
-//				rangeMatchingContext = qb.range().onField(fieldName);
-//			} else {
-//				rangeMatchingContext.andField(fieldName);
-//			}
-//
-//		}
-//
-//		queries.add(rangeMatchingContext.from(typeConver(min, type)).to(typeConver(max, type)).createQuery());
+		predicateSteps.add(scope.predicate().range().fields(fieldNames).between(min, max));
 		return this;
 	}
 
 	/**
 	 * above
-	 * @param fieldName
 	 * @param value
+	 * @param fieldNames
 	 * @return
 	 */
-	public QuerySearchObject<T> above(String fieldName, Object value){
-		return above(fieldName, value, null);
+	public QuerySearchObject<T> above(Object value, String... fieldNames) {
+		return range(value, null, fieldNames);
 	}
-	
-	/**
-	 * above，在搜索值之上，包含搜索的值
-	 * @param fieldName		字段名
-	 * @param value			值
-	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
-	 * @return
-	 */
-	public QuerySearchObject<T> above(String fieldName, Object value, Class type){
-		needJoinTable(fieldName);
-//		queries.add(qb.range().onField(fieldName).above(typeConver(value, type)).createQuery());
-		return this;
-	}
-	
+
 	/**
 	 * below
-	 * @param fieldName
 	 * @param value
+	 * @param fieldNames
 	 * @return
 	 */
-	public QuerySearchObject<T> below(String fieldName, Object value){
-		return below(fieldName, value, null);
+	public QuerySearchObject<T> below(Object value, String... fieldNames) {
+		return range((Object)null, value, fieldNames);
 	}
-	
-	/**
-	 * below
-	 * @param fieldName
-	 * @param value
-	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
-	 * @return
-	 */
-	public QuerySearchObject<T> below(String fieldName, Object value, Class type){
-		needJoinTable(fieldName);
-//		queries.add(qb.range().onField(fieldName).below(typeConver(value, type)).createQuery());
-		return this;
-	}
-	
-	/**
-	 * 类型转换
-	 * @param value 要转换的值
-	 * @param type 指定要比较的类型，对于这种搜索，若类型不对是搜不出来结果的。比如，要搜索的字段是double，但传入的是Int, 则搜不到结果
-	 * @return {@link Object}
-	 */
-	private Object typeConver(Object value, Class type) {
-		Object val = value;
-		if(type == null) {
-			// 什么也不做
-		}else if(type == int.class || type == Integer.class) {
-			val = Integer.valueOf(value + "");
-		}else if(type == long.class || type == Long.class) {
-			val = Long.valueOf(value + "");
-		}else if(type == short.class || type == Short.class) {
-			val = Short.valueOf(value + "");
-		}else if(type == double.class || type == Double.class) {
-			val = Double.valueOf(value + "");
-		}
-		
-		return val;
-	}
-	
+
 	/**
 	 * 匹配，只要有一个字或一个词匹配上就能查到结果
 	 * @param value
 	 * @param fieldNames
+	 * @see QuerySearchObject#matchId(Object) 查询id的情况下用此方法 
 	 * @return
 	 */
 	public QuerySearchObject<T> match(Object value, String... fieldNames){
-    	if(value instanceof String && value.toString().contains(" ")) {
-    		return match(value.toString().split(" "), fieldNames);
-    	}
+		Objects.requireNonNull(fieldNames);
+		List<String> list = new ArrayList<>(Arrays.asList(fieldNames));
+		if(list.contains("id")) {
+			matchId(value);
+			list.remove("id");
+		}
 
-		queries.add(scope.predicate().match().fields(fieldNames).matching(value, ValueConvert.NO));
-    	
-//    	queries.add(qb.keyword().onFields(fieldNames).matching(value).createQuery());
+		if(!list.isEmpty()) {
+			String[] fields = list.toArray(new String[0]);
+			if(value == null) {
+				for (String field : fields) {
+					predicateSteps.add(scope.predicate().bool().mustNot(scope.predicate().exists().field(field)));
+				}
+			} else {
+				if(list.size() > 0) {
+					if(value instanceof Collection) {
+						BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
+						for (Object v : ((Collection) value)) {
+							bool.should(scope.predicate().match().fields(fields).matching(v));
+						}
+						predicateSteps.add(bool);
+					} else if(value instanceof Object[]) {
+						BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
+						for (Object v : ((Object[]) value)) {
+							bool.should(scope.predicate().match().fields(fields).matching(v));
+						}
+						predicateSteps.add(bool);
+					} else {
+						predicateSteps.add(scope.predicate().match().fields(fields).matching(value));
+					}
+				}
+			}
+		}
 		return this;
 	}
-	
+
 	/**
-	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这种针对的是多个值的情况下，比如枚举或对象，不能像空格那样拼写的
-	 * @param values
-	 * @param fieldNames
+	 * id查询
+	 * @param value 值，not null，单个值或Collection
 	 * @return
 	 */
-//	public QuerySearchObject<T> match(Object[] values, String... fieldNames){
-//		return match(Arrays.asList(values), fieldNames);
-//	}
-	
-	/**
-	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这种针对的是多个值的情况下，比如枚举或对象，不能像空格那样拼写的
-	 * @param values
-	 * @param fieldNames
-	 * @return
-	 */
-//	public QuerySearchObject<T> match(Collection values, String... fieldNames){
-//		// 这个只是添加联表用的
-//		for(String s : Objects.requireNonNull(fieldNames))  {
-//			needJoinTable(s);
-//		}
-//
-////		BooleanJunction<BooleanJunction> bool = qb.bool();
-////		for(Object v : Objects.requireNonNull(values)) {
-////			bool.should(qb.keyword().onFields(fieldNames).matching(v).createQuery());
-////		}
-////
-////		queries.add(bool.createQuery());
-//		return this;
-//	}
-	
+	public QuerySearchObject<T> matchId(Object value){
+		Objects.requireNonNull(value);
+		if(value instanceof Collection) {
+			predicateSteps.add(scope.predicate().id().matchingAny((Collection) value));
+		} else {
+			predicateSteps.add(scope.predicate().id().matching(value));
+		}
+		return this;
+	}
+
 	/**
 	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这个一般是匹配单个字符，加上*号
 	 * @param value
 	 * @param fieldNames
 	 * @return
 	 */
-	public QuerySearchObject<T> wildcardMatch(Object value, String... fieldNames){
-		// 这个只是添加联表用的
-//		for(String s : fieldNames)
-//			needJoinTable(s);
-//
-//		queries.add(qb.keyword().wildcard().onFields(fieldNames).matching(value + "*").createQuery());
+	public QuerySearchObject<T> wildcardMatch(String value, String... fieldNames){
+		predicateSteps.add(scope.predicate().wildcard().fields(fieldNames).matching(value));
 		return this;
 	}
 
@@ -284,15 +201,36 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> join(String... fields){
-		// 这个是添加联表用的，和上面的代码不冲突
-		for(String s : fields) {
-			if(!s.contains(".")) {
-				joinFields.add(s);
+		for (String field : fields) {
+			if(!field.contains(".")) {
+				graph.addSubgraph(field);
 				continue;
 			}
-			needJoinTable(s, true);
+
+			String[] arr = field.split("\\.");
+			Subgraph subgraph = null;
+			for (int i = 0; i < arr.length; i++) {
+				String s = arr[i];
+
+				List<AttributeNode<?>> attributeNodes = subgraph == null ? graph.getAttributeNodes()
+						: subgraph.getAttributeNodes();
+				if(attributeNodes != null && !attributeNodes.isEmpty()) {
+					AttributeNode<?> attr = attributeNodes.stream()
+							.filter(e -> e.getAttributeName().equals(s)).findFirst().orElse(null);
+					if(attr != null) {
+						Map<Class, Subgraph> subgraphs = attr.getSubgraphs();
+						subgraph = subgraphs.values().iterator().next();
+						continue;
+					}
+				}
+
+				if(subgraph == null) {
+					subgraph = graph.addSubgraph(s);
+				} else {
+					subgraph = subgraph.addSubgraph(s);
+				}
+			}
 		}
-		
 		return this;
 	}
 	
@@ -337,46 +275,14 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> sort(String field, boolean reverse){
-		return sort(field, SortField.Type.STRING, reverse);
-	}
-	
-	/**
-	 * 排序
-	 * @param field 要排序的字段，要加上@SortableField注解
-	 * @param type 要排序的字段的类型，默认为STRING <br>
-	 * 		SCORE 			Sort by document score (relevance).  Sort values are Float and higher values are at the front.<br>
-	 * 		DOC 	 			Sort by document number (index order).  Sort values are Integer and lower values are at the front.<br>
-	 * 		STRING			Sort using term values as Strings.  Sort values are String and lower values are at the front. <br>
-	 * 		INT				Sort using term values as encoded Integers.  Sort values are Integer and lower values are at the front. <br>
-	 * 		FLOAT			Sort using term values as encoded Floats.  Sort values are Float and lower values are at the front.<br>
-	 * 		LONG			Sort using term values as encoded Longs.  Sort values are Long and lower values are at the front.<br>
-	 * 		DOUBLE 		Sort using term values as encoded Doubles.  Sort values are Double and lower values are at the front.<br>
-	 * 		CUSTOM		Sort using a custom Comparator.  Sort values are any Comparable and sorting is done according to natural order.<br>
-	 * 		STRING_VAL Sort using term values as Strings, but comparing by value (using String.compareTo) for all comparisons. 
-	 * 							This is typically slower than STRING, which uses ordinals to do the sorting. <br>
-	 * 		BYTES			Sort use byte[] index values.<br>
-	 * 		REWRITEABLE	Force rewriting of SortField using {@link SortField#rewrite(IndexSearcher)} before it can be used for sorting<br>
-	 * @param reverse 是否倒序
-	 * @return {@link QuerySearchObject}
-	 */
-	public QuerySearchObject<T> sort(String field, SortField.Type type, boolean reverse){
-		if(field != null && !"".equals(field.trim())) {
-			sortFields.add(new SortField(field, type, reverse));
+		if(sortStep == null) {
+			sortStep = scope.sort().field(field).order(reverse ? SortOrder.DESC : SortOrder.ASC);
+		} else {
+			sortStep = sortStep.then().field(field).order(reverse ? SortOrder.DESC : SortOrder.ASC);
 		}
-		
 		return this;
 	}
-	
-	/**
-	 *  排序, 默认为自然排序
-	 * @param field 要排序的字段，要加上@SortableField注解
-	 * @param type 要排序的字段的类型，默认为STRING <br>
-	 * @return
-	 */
-	public QuerySearchObject<T> sort(String field, SortField.Type type){
-		return sort(field, type, false);
-	}
-	
+
 	/**
 	 * 距离排序
 	 * @param field Coordinates
@@ -392,11 +298,7 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> sortDistance(String field, boolean reverse){
-		if(centerLatitude == null && centerLongitude == null) {
-			throw new IllegalArgumentException("经纬度不能为null!");
-		}
-		
-		return sortDistance(field, null, null, reverse);
+		return sortDistance(field, centerLongitude, centerLatitude, reverse);
 	}
 	
 	/**
@@ -419,9 +321,13 @@ public class QuerySearchObject<T>{
 	 * @return {@link QuerySearchObject}
 	 */
 	public QuerySearchObject<T> sortDistance(String field, Double centerLongitude, Double centerLatitude, boolean reverse){
-//		sortFields.add(new DistanceSortField(centerLatitude, centerLongitude, field, reverse));
-		
-		setDistanceFields(field, centerLongitude, centerLatitude);
+		setDistanceFields(centerLongitude, centerLatitude);
+		if(sortStep == null) {
+			sortStep = scope.sort().distance(field, centerLatitude, centerLongitude)
+					.order(reverse ? SortOrder.DESC : SortOrder.ASC);
+		} else {
+			sortStep = sortStep.then().field(field).order(reverse ? SortOrder.DESC : SortOrder.ASC);
+		}
 		return this;
 	}
 
@@ -431,17 +337,42 @@ public class QuerySearchObject<T>{
 	 * @param centerLongitude 经度
 	 * @param centerLatitude 纬度
 	 */
+	@Deprecated
 	private void setDistanceFields(String field, Double centerLongitude, Double centerLatitude) {
-		if(field != null && !"".equals(field)) {
-			this.distanceField = field;
+		if(centerLongitude <= -180 || centerLongitude > 180) {
+			throw new IllegalArgumentException("经度取值不正确!");
 		}
-		
-		if(centerLatitude != null && centerLongitude != null){
-			this.centerLatitude = centerLatitude;
-			this.centerLongitude = centerLongitude;
+
+		if(centerLatitude < -90 || centerLatitude > 90) {
+			throw new IllegalArgumentException("纬度取值不正确!");
 		}
+
+		this.centerLatitude = centerLatitude;
+		this.centerLongitude = centerLongitude;
 	}
-	
+
+	/**
+	 * 设置和距离相关的属性
+	 * @param centerLongitude 经度
+	 * @param centerLatitude 纬度
+	 */
+	private void setDistanceFields(Double centerLongitude, Double centerLatitude) {
+		if(centerLatitude == null && centerLongitude == null) {
+			throw new IllegalArgumentException("经纬度不能为null!");
+		}
+
+		if(centerLongitude <= -180 || centerLongitude > 180) {
+			throw new IllegalArgumentException("经度取值不正确!");
+		}
+
+		if(centerLatitude < -90 || centerLatitude > 90) {
+			throw new IllegalArgumentException("纬度取值不正确!");
+		}
+
+		this.centerLatitude = centerLatitude;
+		this.centerLongitude = centerLongitude;
+	}
+
 	/**
 	 * 搜索，结果不带分页，默认获取Integer的最大值个结果
 	 * @return {@link List}
@@ -467,17 +398,10 @@ public class QuerySearchObject<T>{
 	 * @param centerLatitude 纬度 Latitude values must be in the range [-90, 90]. Positive values are north of the equator.
 	 * @return {@link QuerySearchObject}
 	 */
+	@Deprecated
 	public QuerySearchObject<T> distance(double distanceInKilometers, double centerLongitude, double centerLatitude){
 		if(distanceInKilometers < 0) {
 			throw new IllegalArgumentException("距离不能为负数!");
-		}
-		
-		if(centerLongitude <= -180 || centerLongitude > 180) {
-			throw new IllegalArgumentException("经度取值不正确!");
-		}
-		
-		if(centerLatitude < -90 || centerLatitude > 90) {
-			throw new IllegalArgumentException("纬度取值不正确!");
 		}
 		
 //		org.apache.lucene.search.Query luceneQuery = qb.spatial().within(distanceInKilometers, Unit.KM)
@@ -488,7 +412,30 @@ public class QuerySearchObject<T>{
 		setDistanceFields(null, centerLongitude, centerLatitude);
 		return this;
 	}
-	
+
+	/**
+	 * 搜索附近，单位：km
+	 * @param distanceInKilometers 距离
+	 * @param centerLongitude 经度	Longitude values must be in the range (-180, 180].
+	 *                           Positive values are east of the prime meridian.
+	 * @param centerLatitude 纬度 Latitude values must be in the range [-90, 90].
+	 *                       Positive values are north of the equator.
+	 * @param fieldNames	要查询的字段
+	 * @return {@link QuerySearchObject}
+	 */
+	public QuerySearchObject<T> distance(double distanceInKilometers, double centerLongitude,
+										 double centerLatitude, String... fieldNames){
+		if(distanceInKilometers < 0) {
+			throw new IllegalArgumentException("距离不能为负数!");
+		}
+
+		setDistanceFields(centerLongitude, centerLatitude);
+
+		predicateSteps.add(scope.predicate().spatial().within().fields(fieldNames)
+				.circle(centerLatitude, centerLongitude, distanceInKilometers, DistanceUnit.KILOMETERS));
+		return this;
+	}
+
 	/**
 	 * 查找列表，带查询距离，查询的结果是数组，0 距离， 1 查询的类<br>
 	 * 该方法是对于调了distance()方法的，已经将经纬度保存了，不需要再次传参，如果没有调用distance()方法，会抛出异常
@@ -497,11 +444,13 @@ public class QuerySearchObject<T>{
 	 * @return
 	 */
 	public List<Object[]> listWithDistance(Integer pageNo, Integer pageSize) {
-		if(distanceField == null || "".equals(distanceField)) {
-			throw new IllegalArgumentException("查询距离的字段field不能为空!");
-		}
-		
-		return listWithDistance(distanceField, pageNo, pageSize);
+//		if(distanceField == null || "".equals(distanceField)) {
+//			throw new IllegalArgumentException("查询距离的字段field不能为空!");
+//		}
+//
+//		return listWithDistance(distanceField, pageNo, pageSize);
+
+		return null;
 	}
 	
 	/**
@@ -554,12 +503,13 @@ public class QuerySearchObject<T>{
      * @param pageSize 每页获取数量
      * @return {@link List}
      */
-    private <E>List<E> list(String field, Double centerLongitude, Double centerLatitude, Integer pageNo, Integer pageSize) {
+    private <E>List<E> list(String field, Double centerLongitude, Double centerLatitude,
+							Integer pageNo, Integer pageSize) {
     	Map<String, Object> map = search(field, centerLongitude, centerLatitude, pageNo, pageSize);
     	return (List<E>) map.get("list");
     }
-	
-    /**
+
+	/**
      * 查找列表，带查询距离，查询的结果是数组，长度为2，0 距离， 1 查询的类
      * @param field Coordinates，根据此字段来计算距离，具体见User类中的getLocation()方法，属性名就是location
      * @param centerLongitude 经度
@@ -571,65 +521,39 @@ public class QuerySearchObject<T>{
     private Map<String, Object> search(String field, Double centerLongitude,
 									   Double centerLatitude, Integer pageNo, Integer pageSize) {
 
-//		BooleanPredicateClausesStep<?> b = scope.predicate().bool();
-//		b.must(scope.predicate().match().field(""))
-
-
-//		List<T> result = searchSession.search( scope )
-//				.where( scope.predicate().match().field( "title" )
-//						.matching( "robot" )
-//						.toPredicate() )
-//				.fetchHits( 20 );
-
-		SearchScope<T> scope = searchSession.scope(clazz);
-
 		pageNo = pageNo == null ? 0 : pageNo;
 		pageSize = pageSize == null ? Integer.MAX_VALUE : pageSize;
 		pageNo = pageNo * pageSize;
-		SearchResult<T> searchResult = searchSession.search(clazz).where(f -> {
-			/*if(queries.isEmpty()) {
-				return f.matchAll();
-			}
 
-			BooleanPredicateClausesStep<?> bool = f.bool();
-			for (MatchPredicateOptionsStep query : queries) {
-				bool = bool.must(query);
-			}
-			return bool;*/
+		SearchQueryOptionsStep search = searchSession.search(clazz)
+			.where(f -> {
+				if (predicateSteps.isEmpty()) {
+					return f.matchAll();
+				}
 
-			// 查null值
-			return f.bool().mustNot(f.exists().field("name"));
+				BooleanPredicateClausesStep<?> bool = f.bool();
+				for (PredicateFinalStep step : predicateSteps) {
+					bool = bool.must(step);
+				}
+				return bool;
+			});
 
-//			return f.exists().field("name");
-		}).fetch(pageNo, pageSize);
+		if(graph != null) {
+			((SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>)search)
+					.loading( o -> o.graph(graph, GraphSemantic.FETCH));
+		}
+
+		if(sortStep != null) {
+			search.sort(sortStep.toSort());
+		}
+
+		SearchResult<T> searchResult = search.fetch(pageNo, pageSize);
 
 		this.count = searchResult.total().hitCount();
-		List<T> results = searchResult.hits();
-
-//    	if(!joinFields.isEmpty()) {
-//    		joinFields.forEach(j -> criteria.setFetchMode(j, FetchMode.JOIN));
-//    		hibQuery.setCriteriaQuery(criteria);
-//    	}
-//
-//    	if(!sortFields.isEmpty()) {
-//    		hibQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
-//    	}
-//
-//    	if(centerLatitude != null && centerLongitude != null && field != null && !"".equals(field)) {
-//    		hibQuery.setProjection(FullTextQuery.SPATIAL_DISTANCE, FullTextQuery.THIS);
-//    		// 对于这种查询距离的类，要有getLocation方法，或者别的方法，此地方要传入属性名（实际不一定要有该属性，只要有get方法就行），具体见User类
-//    		hibQuery.setSpatialParameters(centerLatitude, centerLongitude, field);
-//    	}
-//
-
 		Map<String, Object> map = new HashMap<>();
-//    	this.count = hibQuery.getResultSize();
-//    	// 这一句只能话在前面，如果先获取了List，再获取数量则会报错
-    	map.put("count", count);
-//
-//    	List list = hibQuery.list();
-//    	// 有些情况下返回的集合不是java.util.ArrayList.ArrayList, 比如获取到单个值，是Collections中的SingleList,
-//    	// 在某些操作下会出异常，所以封装处理过
+		map.put("count", count);
+
+		List<T> results = searchResult.hits();
 		map.put("list", results == null ? new ArrayList<>() : new ArrayList<>(results));
     	
     	return map;

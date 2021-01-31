@@ -1,15 +1,12 @@
 package entity;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-//@Indexed
+@Indexed
 public class Company extends BaseIdEntity{
 
 	private static final long serialVersionUID = 7417935378941308762L;
@@ -27,7 +24,7 @@ public class Company extends BaseIdEntity{
 		this.name = name;
 	}
 	
-//	@FullTextField
+	@FullTextField(analyzer = "chinese")
 	private String name;
 	
 //	@IndexedEmbedded(includeEmbeddedObjectId = true)
@@ -41,7 +38,7 @@ public class Company extends BaseIdEntity{
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "company")
 	private List<CompanyAddress> addresses;
 	
-//	@GenericField
+	@GenericField
 	@Enumerated(EnumType.STRING)
 	private CompanyType companyType;
 

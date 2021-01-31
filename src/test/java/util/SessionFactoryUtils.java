@@ -56,8 +56,9 @@ public class SessionFactoryUtils {
 		File[] fs = file.listFiles();
 		for(File f : fs) {
 			Class clazz = Class.forName("entity." + f.getName().substring(0, f.getName().indexOf(".class")));
-			if((clazz.getModifiers() & Modifier.ABSTRACT) == 0)
+			if((clazz.getModifiers() & Modifier.ABSTRACT) == 0) {
 				list.add(clazz);
+			}
 		}
 		System.out.println(list.size());
 		System.out.println(list);

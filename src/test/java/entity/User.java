@@ -3,6 +3,8 @@ package entity;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
@@ -23,11 +25,11 @@ import java.util.Set;
 		@ColumnResult(name = "id", type = Long.class), @ColumnResult(name = "name"), // string类型可以不用指明
 		@ColumnResult(name = "age", type = int.class) // 类似int等类型要特殊指明
 }))
-//@Spatial(spatialMode = SpatialMode.HASH)
 @Entity
 @DynamicInsert
 @DynamicUpdate
 @Indexed
+@GeoPointBinding(fieldName = "location", sortable = Sortable.YES)
 public class User extends BaseIdEntity implements Comparable<User>{
 
 	private static final long serialVersionUID = 741793537894130462L;
@@ -65,7 +67,9 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@FullTextField
 	private String info;
 
-	@ScaledNumberField(sortable = Sortable.YES, indexNullAs = "-1")
+	// 若加了null的替代值，不能再直接使用null搜索
+	@ScaledNumberField(sortable = Sortable.YES)
+//	@ScaledNumberField(sortable = Sortable.YES, indexNullAs = "-1")
 	private BigDecimal property;
 
 	// includePaths 写出要查询的字段，这个可以不加，但如果加了，对方类的字段上必须加上@Field注解
@@ -79,6 +83,9 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<Address> addresses;
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+	private Set<Address> companyAddresses;
+
 //	@Transient
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
 	private List<Company> companies;
@@ -91,22 +98,6 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@Longitude
 	private Double longitude;
 
-//	@SortableField
-//	@Spatial(spatialMode = SpatialMode.HASH)
-//	public Coordinates getLocation() {
-//		return new Coordinates() {
-//			@Override
-//			public Double getLatitude() {
-//				return latitude;
-//			}
-//
-//			@Override
-//			public Double getLongitude() {
-//				return longitude;
-//			}
-//		};
-//	}
-	
 	@Version
 	private int version;
 	
@@ -120,7 +111,7 @@ public class User extends BaseIdEntity implements Comparable<User>{
 //	@GenericField
 	private LocalTime time;
 	
-//	@GenericField
+	@GenericField
 	private LocalDateTime dateTime;
 	
 //	@Type(type = "descriptor.CommaDelimitedListToStringsDescriptor")
@@ -307,5 +298,13 @@ public class User extends BaseIdEntity implements Comparable<User>{
 
 	public void setInterestings(List<UserInteresting> interestings) {
 		this.interestings = interestings;
+	}
+
+	public Set<Address> getCompanyAddresses() {
+		return companyAddresses;
+	}
+
+	public void setCompanyAddresses(Set<Address> companyAddresses) {
+		this.companyAddresses = companyAddresses;
 	}
 }

@@ -19,10 +19,10 @@ public class Product extends BaseIdEntity {
 
 	private static final long serialVersionUID = 3190769021252599177L;
 
-	@FullTextField
+	@FullTextField(analyzer = "chinese")
 	private String name;
 	
-	@FullTextField
+	@FullTextField(analyzer = "chinese")
 	private String subtitle;
 	
 	/**
