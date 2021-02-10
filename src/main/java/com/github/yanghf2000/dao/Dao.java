@@ -968,7 +968,11 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public void maintainIndex(Class... types) throws InterruptedException {
-    	getFullTextSession().createIndexer(Objects.requireNonNull(types)).startAndWait();
+        if(types == null || types.length < 1) {
+            maintainIndex();
+        } else {
+            getFullTextSession().createIndexer(Objects.requireNonNull(types)).startAndWait();
+        }
     }
 
     /**
