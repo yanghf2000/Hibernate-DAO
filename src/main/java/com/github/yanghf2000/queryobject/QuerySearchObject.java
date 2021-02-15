@@ -235,31 +235,6 @@ public class QuerySearchObject<T>{
 	}
 	
 	/**
-	 * 处理是否需要关联表
-	 * @param fieldName
-	 */
-	private void needJoinTable(String fieldName) {
-		needJoinTable(fieldName, false);
-	}
-	
-	/**
-	 * 处理是否需要关联表
-	 * @param fieldName
-	 */
-	private void needJoinTable(String fieldName, boolean includeLastFieldName) {
-		if(fieldName.contains(".")) {
-			String[] arr = fieldName.split("\\.");
-			StringBuffer buffer = new StringBuffer();
-			int len = includeLastFieldName ? arr.length : arr.length - 1;
-			for(int i = 0; i < len; i++) {
-				buffer.append(arr[i]);
-				joinFields.add(buffer.toString());
-				buffer.append(".");
-			}
-		}
-	}
-	
-	/**
 	 * 排序, 默认按自然排序
 	 * @param field 要排序的字段，要加上@SortableField注解
 	 * @return {@link QuerySearchObject}

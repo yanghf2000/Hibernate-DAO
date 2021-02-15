@@ -5,7 +5,6 @@ import dao.CompanyDao;
 import dao.ProductDao;
 import dao.UserDao;
 import entity.*;
-import org.apache.lucene.search.SortField;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -17,7 +16,6 @@ import util.SessionFactoryUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -204,9 +202,16 @@ public class TestQuerySearchObject {
 	 */
 	@Test
 	public void testMatchId4() {
-		List<Address> list = addressDao.getQuerySearchObject().match(1L, "user.id").list();
+		List<Address> list = addressDao.getQuerySearchObject().match(2L, "user.id").list();
 		System.out.println(list.size());
-		list.forEach(e -> System.out.println(e.getStreet()));
+		list.forEach(e -> System.out.println(e.getUser().getId() + " " + e.getId() + " " + e.getStreet()));
+	}
+
+	@Test
+	public void testMatchId5() {
+		List<Company> list = companyDao.getQuerySearchObject().match(2L, "user.id").list();
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getName()));
 	}
 
 	/**
@@ -324,9 +329,9 @@ public class TestQuerySearchObject {
 	@Test
 	public void testSortId() {
 		List<User> list5 = userDao.getQuerySearchObject()
-				.sort("id", true).list(0, 20);
+				.sort("id2", true).list(0, 20);
 		System.out.println(list5.size());
-		list5.forEach(u -> System.out.println(u.getName() + "\t" + u.getProperty() + "\t" + u.getAge()));
+		list5.forEach(u -> System.out.println(u.getId() + "\t" + u.getName() + "\t" + u.getProperty() + "\t" + u.getAge()));
 	}
 
 	@Test

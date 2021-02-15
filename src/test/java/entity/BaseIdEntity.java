@@ -1,6 +1,7 @@
 package entity;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +12,7 @@ import javax.persistence.MappedSuperclass;
 public abstract class BaseIdEntity extends BaseEntity{
 
 	@Id
+	@GenericField(name = "id2", sortable = Sortable.YES)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Long id;
 
