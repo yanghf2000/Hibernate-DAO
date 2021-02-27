@@ -40,7 +40,7 @@ public class TestQuerySearchObject {
 		ss = userDao.getSession();
 		tx = ss.beginTransaction();
 		
-		userDao.maintainIndex();
+		userDao.batchMaintainIndex();
 	}
 	
 	@After

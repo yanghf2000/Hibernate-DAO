@@ -8,7 +8,6 @@ import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -965,17 +964,37 @@ public abstract class Dao<T> {
     }
     
     /**
-     * hibernate search索引维护
+     * hibernate search索引维护, 这一种有个问题，就是数据太多的情况下占用内存严重，最后可能导致内存溢出
      * @param types			要维护的类，为空时维护所有
      * @throws InterruptedException
      */
     @SuppressWarnings("rawtypes")
-	public void maintainIndex(Class... types) throws InterruptedException {
-        SearchSession searchSession = Search.session(getSession());
+	public void batchMaintainIndex(Class... types) throws InterruptedException {
         if(types == null || types.length < 1) {
-            searchSession.massIndexer().startAndWait();
+            Search.session(getSession()).massIndexer().startAndWait();
         } else {
+            // 这一种费内存
             Search.session(getSession()).massIndexer(Objects.requireNonNull(types)).startAndWait();
+        }
+    }
+
+    /**
+     * 索引，每批处理
+     * @param type
+     * @param size  每次处理的数量，如为null，默认为10000个
+     * @throws InterruptedException
+     */
+	public void maintainIndex(Class type, Integer size) throws InterruptedException {
+	    if(size == null) {
+	        size = 10_000;
+        }
+        for(int i = 0; ; i++) {
+            List list = QueryObject.getInstance(getSession(), type).list(i * size, (i + 1) * size);
+            if(list == null || list.isEmpty()) {
+                break;
+            }
+            list.forEach(e -> getSearchSession().indexingPlan().addOrUpdate(e));
+            flushAndClear();
         }
     }
 

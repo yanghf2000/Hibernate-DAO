@@ -1,16 +1,5 @@
 package test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import dao.AddressDao;
 import dao.CategoryDao;
 import dao.ProductDao;
@@ -18,7 +7,17 @@ import dao.UserDao;
 import entity.Address;
 import entity.Product;
 import entity.User;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import util.SessionFactoryUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestSearch {
 	
@@ -38,7 +37,7 @@ public class TestSearch {
 
 	@Test
 	public void test() throws InterruptedException {
-		userDao.maintainIndex();
+		userDao.batchMaintainIndex();
 		User user = userDao.get(1L);
 		System.out.println(user);
 	}
@@ -49,7 +48,7 @@ public class TestSearch {
 		ss = userDao.getSession();
 		tx = ss.beginTransaction();
 		
-		userDao.maintainIndex();
+		userDao.batchMaintainIndex();
 	}
 	
 	@After

@@ -16,7 +16,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import util.SessionFactoryUtils;
-import vo.UserVo;
 
 import java.util.*;
 
@@ -566,7 +565,7 @@ public class TestDao {
     
     @Test
     public void maintainIndex() throws InterruptedException{
-    	userDao.maintainIndex(User.class);
+    	userDao.batchMaintainIndex(User.class);
     }
     
     /**
