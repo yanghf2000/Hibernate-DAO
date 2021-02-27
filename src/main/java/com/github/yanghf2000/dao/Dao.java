@@ -985,11 +985,8 @@ public abstract class Dao<T> {
      * @throws InterruptedException
      */
 	public void maintainIndex(Class type, Integer size) throws InterruptedException {
-	    if(size == null) {
-	        size = 10_000;
-        }
         for(int i = 0; ; i++) {
-            List list = QueryObject.getInstance(getSession(), type).list(i * size, (i + 1) * size);
+            List list = QueryObject.getInstance(getSession(), type).list(i, size == null ? 10_000 : size);
             if(list == null || list.isEmpty()) {
                 break;
             }
