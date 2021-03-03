@@ -28,8 +28,10 @@
 		<property name="hibernate.search.backend.directory.type">local-filesystem</property>
 		<property name="hibernate.search.backend.directory.root">d://data//hibernate-index</property>
 		<property name="hibernate.search.backend.directory.filesystem_access.strategy">auto</property>
-		<property name="hibernate.search.backend.directory.locking.strategy">native-filesystem</property>
+		<property name="hibernate.search.backend.directory.locking.strategy">none</property>
 		<property name="hibernate.search.backend.analysis.configurer">analyzer.AnalysisConfigurer</property>
+
+<!--		<property name="hibernate.search.backend.uris">http://localhost:9200</property>-->
 
     </session-factory>
 </hibernate-configuration>
