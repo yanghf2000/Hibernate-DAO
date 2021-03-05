@@ -178,6 +178,12 @@ public class QuerySearchObject<T>{
 		Objects.requireNonNull(value);
 		if(value instanceof Collection) {
 			predicateSteps.add(scope.predicate().id().matchingAny((Collection) value));
+		} else if(value instanceof Object[]) {
+			List list = new ArrayList();
+			for (Object o : ((Object[]) value)) {
+				list.add(o);
+			}
+			predicateSteps.add(scope.predicate().id().matchingAny(list));
 		} else {
 			predicateSteps.add(scope.predicate().id().matching(value));
 		}
