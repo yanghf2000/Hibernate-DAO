@@ -1014,9 +1014,10 @@ public abstract class Dao<T> {
         if(ids != null && ids.length > 0) {
             for(int i = 0, qty = 1000; ; i++) {
                 List<T> objs = this.getQueryObject().andIn("id", ids).list(i, qty);
-                if(objs != null && !objs.isEmpty()) {
-                    objs.forEach(this::index);
+                if(objs == null || objs.isEmpty()) {
+                    break;
                 }
+                objs.forEach(this::index);
             }
         }
     }
