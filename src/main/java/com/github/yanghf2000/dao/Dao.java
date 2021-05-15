@@ -4,6 +4,7 @@ import com.github.yanghf2000.queryobject.QueryDeleteObject;
 import com.github.yanghf2000.queryobject.QueryObject;
 import com.github.yanghf2000.queryobject.QuerySearchObject;
 import com.github.yanghf2000.queryobject.QueryUpdateObject;
+import org.apache.lucene.util.CollectionUtil;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -1062,8 +1063,11 @@ public abstract class Dao<T> {
      */
     public void batchDeleteIndex(Serializable... ids) {
         if(ids != null && ids.length > 0) {
-            for (Serializable id : ids) {
-                deleteIndex(id);
+            List<T> list = this.getQueryObject().andIn("id", ids).list();
+            if(list != null && !list.isEmpty()) {
+                for (T t : list) {
+                    getSearchSession().indexingPlan().delete(t);
+                }
             }
         }
     }
