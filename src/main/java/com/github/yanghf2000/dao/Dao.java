@@ -304,6 +304,19 @@ public abstract class Dao<T> {
     }
 
     /**
+     * 用原生sql执行更新
+     * @param sql
+     * @param args
+     * @return 返回执行成功的行数
+     */
+    @SuppressWarnings("rawtypes")
+	public int updateBySql(String sql, Integer timeOut, Object... args) {
+        Query query = getSession(timeOut == null ? TIME_OUT : timeOut).createNativeQuery(sql);
+        addParameters(query, true, args);
+        return query.executeUpdate();
+    }
+
+    /**
      * 为query添加参数
      * @param query
      * @param isNativeQuery
