@@ -252,7 +252,7 @@ public class TestDao {
 
 	@Test
     public void deleteById() {
-    	int n = userDao.delete(15);
+    	int n = userDao.deleteById(15L);
     	System.out.println(n);
     }
     

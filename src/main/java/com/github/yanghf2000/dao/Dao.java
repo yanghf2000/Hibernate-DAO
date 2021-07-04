@@ -188,7 +188,7 @@ public abstract class Dao<T> {
      * @param ids 主键
      * @return 返回删除成功的行数
      */
-    public int delete(Long... ids) {
+    public int deleteById(Long... ids) {
         if(ids == null || ids.length < 1) {
             throw new IllegalArgumentException("ids不能为空!");
         }
