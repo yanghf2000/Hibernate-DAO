@@ -185,11 +185,14 @@ public abstract class Dao<T> {
 
     /**
      * 对于大多数有id的对象，根据id删除对象，返回删除的数量
-     * @param id 主键
+     * @param ids 主键
      * @return 返回删除成功的行数
      */
-    public int delete(long id) {
-    	return delete("id", id);
+    public int delete(Long... ids) {
+        if(ids == null || ids.length < 1) {
+            throw new IllegalArgumentException("ids不能为空!");
+        }
+    	return delete("id", Arrays.asList(ids));
     }
     
     /**
@@ -213,12 +216,12 @@ public abstract class Dao<T> {
     	Root<T> root = criteria.from(clazz);
     	Path<Object> path = root.get(propertyName);
     	
-    	if(value instanceof List) {
-            criteria.where(path.in((List) value));
+    	if(value instanceof Collection) {
+            criteria.where(path.in((Collection) value));
         } else {
             criteria.where(builder.equal(path, value));
         }
-    		
+
     	return getSession().createQuery(criteria).executeUpdate();
     }
 	
