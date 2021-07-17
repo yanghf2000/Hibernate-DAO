@@ -3,6 +3,7 @@ package com.github.yanghf2000.queryobject;
 import org.hibernate.Session;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
+import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -64,19 +65,37 @@ public class QuerySearchObject<T>{
 	}
 	
 	// ********************************** 以下为添加条件 ********************************
-	
+
+
 	/**
-	 * sentence，能与所有的关键词匹配上才能查找到结果<br>
-	 * 比如：字段是：你叫什么名字 value 是什么 什么名字都可以，但如果是什么的名字，就查找不到，只有要有一个不匹配就不行<br>
-	 * 对于xx.xx这种级联查询，不能用sentence，要用match，否则报错，找不到字段
-	 * So far we have been looking for words or sets of words, you can also search exact or approximate sentences. Use phrase() to do so<br>
-	 * @param fieldName 字段名
-	 * @param value 值
+	 * 添加or条件
+	 * @param steps	List<PredicateFinalStep> 所有and查询条件放在一起
 	 * @return {@link QuerySearchObject}
 	 */
-	@Deprecated
-	public QuerySearchObject<T> sentence(String fieldName, Object value){
-//		queries.add(scope.predicate().phrase().fields(fieldName).matching(null));
+	public QuerySearchObject<T> and(List<PredicateFinalStep> steps) {
+		if(steps != null && !steps.isEmpty()) {
+			BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
+			for (PredicateFinalStep step : steps) {
+				bool = bool.must(step);
+			}
+			this.predicateSteps.add(bool);
+		}
+		return this;
+	}
+
+	/**
+	 * 添加or条件
+	 * @param steps	List<PredicateFinalStep> 所有or查询条件放在一起
+	 * @return {@link QuerySearchObject}
+	 */
+	public QuerySearchObject<T> or(List<PredicateFinalStep> steps) {
+		if(steps != null && !steps.isEmpty()) {
+			BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
+			for (PredicateFinalStep step : steps) {
+				bool = bool.should(step);
+			}
+			this.predicateSteps.add(bool);
+		}
 		return this;
 	}
 
@@ -90,7 +109,7 @@ public class QuerySearchObject<T>{
 	 */
 	public QuerySearchObject<T> phrase(String value, String... fieldNames){
 		// slop：中间可包含的词，如：a b, a x x b都是可以查到的
-		predicateSteps.add(scope.predicate().phrase().fields(fieldNames).matching(value)/*.slop(2)*/);
+		predicateSteps.add(scope.predicate().phrase().fields(fieldNames).matching(value));
 		return this;
 	}
 
@@ -549,5 +568,9 @@ public class QuerySearchObject<T>{
     public long count(){
     	return count;
     }
-    
+
+	public SearchScope<T> getScope() {
+		return scope;
+	}
+
 }
