@@ -108,6 +108,12 @@
           <version>${hibenate.search.version}</version>
       </dependency>
 
+      <dependency>
+          <groupId>org.hibernate.search</groupId>
+          <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+          <version>${hibenate.search.version}</version>
+      </dependency>
+
       <!--<dependency>
           <groupId>org.hibernate.search</groupId>
           <artifactId>hibernate-search-backend-elasticsearch</artifactId>
