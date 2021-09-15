@@ -1,5 +1,6 @@
 package entity;
 
+import com.github.yanghf2000.analyzer.AnalyzerName;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -50,7 +51,7 @@ public class User extends BaseIdEntity implements Comparable<User>{
 		this.age = age;
 	}
 
-	@FullTextField(analyzer = "chinese")
+	@FullTextField(analyzer = AnalyzerName.CHINESE)
 	@GenericField(name = "name_1", indexNullAs = "")
 	private String name;
 

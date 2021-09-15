@@ -6,6 +6,7 @@
     <session-factory>
     	<property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
 
+		<!-- 数据库参数 -->
     	<property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
     	<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate_test?serverTimezone=GMT</property>
     	<property name="hibernate.connection.username">root</property>
@@ -25,13 +26,22 @@
 
 		<!-- hibernate搜索 -->
 		<property name="hibernate.search.enabled">true</property>
-		<property name="hibernate.search.backend.directory.type">local-filesystem</property>
-		<property name="hibernate.search.backend.directory.root">d://data//hibernate-index</property>
-		<property name="hibernate.search.backend.directory.filesystem_access.strategy">auto</property>
-		<property name="hibernate.search.backend.directory.locking.strategy">none</property>
-		<property name="hibernate.search.backend.analysis.configurer">com.github.yanghf2000.analyzer.ChineseAnalysisConfigurer</property>
+		<!-- elasticsearch, lucene -->
+		<property name="hibernate.search.backend.type">elasticsearch</property>
 
-<!--		<property name="hibernate.search.backend.uris">http://localhost:9200</property>-->
+		<!-- lucene -->
+		<!--		<property name="hibernate.search.backend.directory.type">local-filesystem</property>-->
+		<!--		<property name="hibernate.search.backend.directory.root">d://data//hibernate-index</property>-->
+		<!--		<property name="hibernate.search.backend.directory.filesystem_access.strategy">auto</property>-->
+		<!--		<property name="hibernate.search.backend.directory.locking.strategy">none</property>-->
+<!--		<property name="hibernate.search.backend.analysis.configurer">com.github.yanghf2000.analyzer.ChineseAnalysisLucenceConfigurer</property>-->
+
+		<!-- elasticsearch -->
+		<property name="hibernate.search.backend.protocol">http</property>
+		<property name="hibernate.search.backend.hosts">localhost:9200</property>
+		<property name="hibernate.search.backend.analysis.configurer">com.github.yanghf2000.analyzer.ChineseAnalysisElasticsearchConfigurer</property>
+<!--		<property name="hibernate.search.backend.username">ironman</property>-->
+<!--		<property name="hibernate.search.backend.password">j@rV1s</property>-->
 
     </session-factory>
 </hibernate-configuration>

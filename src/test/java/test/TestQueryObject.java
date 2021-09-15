@@ -36,7 +36,7 @@ public class TestQueryObject {
 	public void test()  {
 		UserDao userDao = new UserDao();
 		User user = (User) userDao.get(1L);
-		System.out.println(user);
+		System.out.println(user.getId() + " " + user.getName());
 	}
 	
 	@Before

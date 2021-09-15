@@ -38,8 +38,9 @@ public abstract class BaseDao<T extends BaseEntity> extends Dao<T> {
 	
     @Override
     public synchronized Session getSession() {
-    	if(session != null)
-    		return session;
+    	if(session != null) {
+			return session;
+		}
     	
 		session = getSessionFactory().openSession();
 		session.setProperty("javax.persistence.query.timeout", TIME_OUT);

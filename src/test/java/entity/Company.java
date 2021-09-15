@@ -1,5 +1,6 @@
 package entity;
 
+import com.github.yanghf2000.analyzer.AnalyzerName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 
 import javax.persistence.*;
@@ -24,7 +25,7 @@ public class Company extends BaseIdEntity{
 		this.name = name;
 	}
 	
-	@FullTextField(analyzer = "chinese")
+	@FullTextField(analyzer = AnalyzerName.CHINESE)
 	private String name;
 	
 	@IndexedEmbedded(includeEmbeddedObjectId = true)

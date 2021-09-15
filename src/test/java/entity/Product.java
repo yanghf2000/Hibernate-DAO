@@ -1,5 +1,6 @@
 package entity;
 
+import com.github.yanghf2000.analyzer.AnalyzerName;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -19,10 +20,10 @@ public class Product extends BaseIdEntity {
 
 	private static final long serialVersionUID = 3190769021252599177L;
 
-	@FullTextField(analyzer = "chinese")
+	@FullTextField(analyzer = AnalyzerName.CHINESE)
 	private String name;
 	
-	@FullTextField(analyzer = "chinese")
+	@FullTextField(analyzer = AnalyzerName.CHINESE)
 	private String subtitle;
 	
 	/**

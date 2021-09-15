@@ -987,16 +987,18 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public void batchMaintainIndex(Class... types) throws InterruptedException {
+        // 索引所有
         if(types == null || types.length < 1) {
             Search.session(getSession()).massIndexer().startAndWait();
-        } else {
-            // 这一种费内存
+        }
+        // 索引指定类
+        else {
             Search.session(getSession()).massIndexer(Objects.requireNonNull(types)).startAndWait();
         }
     }
 
     /**
-     * 索引，每批处理
+     * 索引，分批处理
      * @param type
      * @param size  每次处理的数量，如为null，默认为10000个
      * @throws InterruptedException
@@ -1099,11 +1101,16 @@ public abstract class Dao<T> {
     }
 
     /**
+     * 删除所有索引
      * Remove all entities from of particular class and all its subclasses from the index.
-     * @param clazz
+     * @param types
      */
-    public void purgeAll(Class<T> clazz) {
-        getSearchSession().workspace(clazz).purge();
+    public void purgeAll(Class<T>... types) {
+        if(types == null || types.length < 1) {
+            getSearchSession().workspace().purge();
+        } else {
+            getSearchSession().workspace(types).purge();
+        }
     }
 
     /**

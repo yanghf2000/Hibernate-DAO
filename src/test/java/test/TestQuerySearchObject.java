@@ -8,6 +8,7 @@ import entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.search.mapper.orm.Search;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,11 +25,11 @@ public class TestQuerySearchObject {
 	
 	private SessionFactory sf;
 	
-	private UserDao userDao = new UserDao();
-	private AddressDao addressDao = new AddressDao();
-	private CompanyDao companyDao = new CompanyDao();
-	private ProductDao productDao = new ProductDao();
-	
+	private final UserDao userDao = new UserDao();
+	private final AddressDao addressDao = new AddressDao();
+	private final CompanyDao companyDao = new CompanyDao();
+	private final ProductDao productDao = new ProductDao();
+
 	private Session ss;
 	private Transaction tx;
 	
@@ -37,9 +38,10 @@ public class TestQuerySearchObject {
 	@Before
 	public void before() throws InterruptedException {
 		sf = SessionFactoryUtils.build();
-		ss = userDao.getSession();
+		ss = sf.openSession();
 		tx = ss.beginTransaction();
-		
+
+		Search.session(ss).workspace().purge();
 		userDao.batchMaintainIndex();
 	}
 	
@@ -49,11 +51,13 @@ public class TestQuerySearchObject {
 			tx.commit();
 		}
 		
-		if(sf != null && sf.isOpen())
+		if(sf != null && sf.isOpen()) {
 			sf.close();
+		}
 		
-		if(ss != null && ss.isOpen())
+		if(ss != null && ss.isOpen()) {
 			ss.close();
+		}
 	}
 
 	/**

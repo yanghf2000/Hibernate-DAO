@@ -1,5 +1,6 @@
 package entity;
 
+import com.github.yanghf2000.analyzer.AnalyzerName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -38,7 +39,7 @@ public class Address extends BaseIdEntity{
 	@GenericField
 	private String county;
 
-	@FullTextField(analyzer = "chinese")
+	@FullTextField(analyzer = AnalyzerName.CHINESE)
 	private String street;
 
 	public User getUser() {

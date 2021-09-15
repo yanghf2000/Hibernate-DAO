@@ -378,7 +378,7 @@ public class QuerySearchObject<T>{
 	 * @return {@link List}
 	 */
 	public <E>List<E> list() {
-		return list(0, Integer.MAX_VALUE);
+		return list(0, 10000);
 	}
 	
 	/**
@@ -522,7 +522,7 @@ public class QuerySearchObject<T>{
 									   Double centerLatitude, Integer pageNo, Integer pageSize) {
 
 		pageNo = pageNo == null ? 0 : pageNo;
-		pageSize = pageSize == null ? Integer.MAX_VALUE : pageSize;
+		pageSize = pageSize == null ? 10000 : pageSize;
 		pageNo = pageNo * pageSize;
 
 		SearchQueryOptionsStep search = searchSession.search(clazz)

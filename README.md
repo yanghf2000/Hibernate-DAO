@@ -5,6 +5,9 @@ Hibernate通用DAO
 	在test文件夹下提供了测试方法，方便进行测试。
 	若有问题或建议可以联系我: yanghf2000@163.com
 
+2021-9-15
+增加使用elasticsearch搜索
+
 2021-1-31
 测试hibernate search 6.0.0
 
