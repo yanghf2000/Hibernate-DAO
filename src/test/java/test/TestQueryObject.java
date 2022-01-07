@@ -84,19 +84,20 @@ public class TestQueryObject {
 	@Test
 	public void testEqual() {
 		User u = userDao.get(1L);
-		System.out.println(u);
-		
+
+		System.out.println(u == null ? null : u.getJobs() + " " + u.getInterestingNumbers());
+
 //		Set<String> jobs = new HashSet<>(Arrays.asList("",""));
-		List<String> jobs =Arrays.asList("AA","BB");
-		u.setJobs(jobs);
+//		List<String> jobs =Arrays.asList("AA","BB");
+//		u.setJobs(jobs);
 		
-		User u1 = new User();
-		u1.setJobs(jobs);
-		System.out.println("u1: " + u1);
+//		User u1 = new User();
+//		u1.setJobs(jobs);
+//		System.out.println("u1: " + u1);
 //		userDao.save(u1);
 		
-		User user = userDao.getQueryObject().andEqual("name", "125").getOne();
-		System.out.println(user);
+//		User user = userDao.getQueryObject().andEqual("name", "125").getOne();
+//		System.out.println(user);
 		
 		// 这种无法查数据
 //		List<User> list = userDao.getQueryObject().andIn("jobs", jobs).list();

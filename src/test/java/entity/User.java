@@ -3,6 +3,8 @@ package entity;
 import com.github.yanghf2000.analyzer.AnalyzerName;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.Type;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
@@ -115,9 +117,11 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@GenericField
 	private LocalDateTime dateTime;
 	
-//	@Type(type = "descriptor.CommaDelimitedListToStringsDescriptor")
-	@Transient
+	@Type(type = "com.github.yanghf2000.descriptor.CommaDelimitedListToStringsDescriptor")
 	private List<String> jobs = new ArrayList<>();
+
+	@Type(type = "com.github.yanghf2000.descriptor.CommaDelimitedListToStringsDescriptor")
+	private List<Integer> interestingNumbers = new ArrayList<>();
 
 	// 对于以下想处理集合的，但没有独立类的，也是可以搜索的
 //	@IndexedEmbedded
@@ -307,5 +311,13 @@ public class User extends BaseIdEntity implements Comparable<User>{
 
 	public void setCompanyAddresses(Set<Address> companyAddresses) {
 		this.companyAddresses = companyAddresses;
+	}
+
+	public List<Integer> getInterestingNumbers() {
+		return interestingNumbers;
+	}
+
+	public void setInterestingNumbers(List<Integer> interestingNumbers) {
+		this.interestingNumbers = interestingNumbers;
 	}
 }

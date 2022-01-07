@@ -1005,7 +1005,7 @@ public abstract class Dao<T> {
      */
 	public void maintainIndex(Class type, Integer size) throws InterruptedException {
         for(int i = 0; ; i++) {
-            List list = QueryObject.getInstance(getSession(), type).list(i, size == null ? 10_000 : size);
+            List list = QueryObject.getInstance(getSession(), Objects.requireNonNull(type)).list(i, size == null ? 10_000 : size);
             if(list == null || list.isEmpty()) {
                 break;
             }
@@ -1105,11 +1105,11 @@ public abstract class Dao<T> {
      * Remove all entities from of particular class and all its subclasses from the index.
      * @param types
      */
-    public void purgeAll(Class<T>... types) {
+    public void purgeAll(Integer timeout, Class<T>... types) {
         if(types == null || types.length < 1) {
-            getSearchSession().workspace().purge();
+            getSearchSession(timeout).workspace().purge();
         } else {
-            getSearchSession().workspace(types).purge();
+            getSearchSession(timeout).workspace(types).purge();
         }
     }
 
