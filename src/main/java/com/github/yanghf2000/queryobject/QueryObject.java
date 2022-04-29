@@ -143,6 +143,18 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 	// ********************************** 以下为添加条件 ********************************
 	
 	/**
+	 * 排序
+	 * @param fieldName 排序字段
+	 * @param asc		是否升序
+	 * @return {@link QueryObject}
+	 */
+	public QueryObject<T> order(String fieldName, boolean asc){
+		Path path = extractPath(fieldName);
+		orders.add(new OrderImpl(extractPath(fieldName), asc));
+		return this;
+	}
+
+	/**
 	 * 升充排序
 	 * @param fieldName 排序字段
 	 * @return {@link QueryObject}
@@ -153,7 +165,7 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
 //		orders.add(new SqmSortSpecification((SqmExpression) path, SortOrder.ASCENDING));
 		return this;
 	}
-	
+
 	/**
 	 * 降充排序
 	 * @param fieldName 排序字段

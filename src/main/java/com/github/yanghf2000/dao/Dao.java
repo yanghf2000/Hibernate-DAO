@@ -466,10 +466,11 @@ public abstract class Dao<T> {
     /**
      * 用hql获取集合，带分页参数
      * @param hql
-     * @param timeout
-     * @param first
-     * @param size
-     * @param objects
+     * @param timeout   毫秒
+     * @param first     从第几个数据开始，最小为0
+     * @param size      要获取的数量
+     * @param objects   参数
+     * @param <E>
      * @return
      */
     public <E> List<E> findByHQLWithLimit(String hql, Integer timeout, Integer first, Integer size, Object... objects) {
@@ -479,7 +480,7 @@ public abstract class Dao<T> {
     /**
      * 查询，可选择是否加锁，分页
      * @param hql
-     * @param timeout
+     * @param timeout   毫秒
      * @param lockOptions
      * @param first
      * @param size
@@ -665,7 +666,7 @@ public abstract class Dao<T> {
 
     /**
      * 取得一个查询对象
-     * @param timeout 超时时间，单位：秒
+     * @param timeout 超时时间，单位：毫秒
      * @return {@link QueryObject}
      */
     public QueryObject<T> getQueryObject(Integer timeout) {
@@ -1053,8 +1054,7 @@ public abstract class Dao<T> {
 
     /**
      * Remove the entity with the type <code>entityType</code> and the identifier <code>id</code> from the index.
-     * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted. In this
-     * case this method behaves like {@link #purgeAll(Class)}.
+     * If <code>id == null</code> all indexed entities of this type and its indexed subclasses are deleted.
      * <p>
      * this method forces a purge operation.
      * @param id

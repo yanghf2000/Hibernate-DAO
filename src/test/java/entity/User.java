@@ -57,13 +57,16 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	@GenericField(name = "name_1", indexNullAs = "")
 	private String name;
 
+	@GenericField
+	private String code;
+
 	@GenericField(sortable = Sortable.YES)
 	private int age;
 
 	@GenericField
 	@Enumerated(EnumType.STRING)
 	private Sex sex;
-	
+
 	@GenericField(sortable = Sortable.YES)
 	private LocalDate birthday;
 
@@ -319,5 +322,13 @@ public class User extends BaseIdEntity implements Comparable<User>{
 
 	public void setInterestingNumbers(List<Integer> interestingNumbers) {
 		this.interestingNumbers = interestingNumbers;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 }

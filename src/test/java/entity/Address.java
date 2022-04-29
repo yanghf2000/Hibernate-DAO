@@ -26,7 +26,7 @@ public class Address extends BaseIdEntity{
 		this.street = street;
 	}
 
-	@IndexedEmbedded(includeDepth = 1, includeEmbeddedObjectId = true, includePaths = {"id", "name"})
+	@IndexedEmbedded(includeEmbeddedObjectId = true, includePaths = {"id", "name"})
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 

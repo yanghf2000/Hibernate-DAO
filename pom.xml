@@ -2,15 +2,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.yanghf2000</groupId>
   <artifactId>hibernatedao</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
-        <hibernate.version>5.6.3.Final</hibernate.version>
-        <hibenate.search.version>6.0.8.Final</hibenate.search.version>
-        <apache.lucene.version>8.11.0</apache.lucene.version>
+        <hibernate.version>5.6.5.Final</hibernate.version>
+        <hibenate.search.version>6.1.0.Final</hibenate.search.version>
+        <apache.lucene.version>8.11.1</apache.lucene.version>
         <mysql.version>8.0.25</mysql.version>
         <c3p0.version>0.9.5.5</c3p0.version>
         <hibernate-jpa-api.version>1.0.2.Final</hibernate-jpa-api.version>
@@ -119,7 +119,7 @@
             <artifactId>lucene-analyzers-smartcn</artifactId>
             <version>${apache.lucene.version}</version>
         </dependency>
-  	
+
   </dependencies>
   
 </project>

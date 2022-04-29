@@ -28,7 +28,7 @@ public class Company extends BaseIdEntity{
 	@FullTextField(analyzer = AnalyzerName.CHINESE)
 	private String name;
 	
-	@IndexedEmbedded(includeEmbeddedObjectId = true)
+	@IndexedEmbedded(includeEmbeddedObjectId = true, includePaths = {"id"})
 	@ManyToOne(fetch = FetchType.LAZY)
 	private User user;
 

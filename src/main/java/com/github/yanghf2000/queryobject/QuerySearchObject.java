@@ -146,7 +146,14 @@ public class QuerySearchObject<T>{
 
 	/**
 	 * 匹配，只要有一个字或一个词匹配上就能查到结果
-	 * @param value
+	 * AND using +
+	 * OR using |
+	 * NOT using -
+	 * List<Book> hits = searchSession.search( Book.class )
+	 *         .where( f -> f.simpleQueryString().field( "description" )
+	 *                 .matching( "robots + (crime | investigation | disappearance)" ) )
+	 *         .fetchHits( 20 );
+	 * @param value		为null时匹配null，空字符串过滤不了
 	 * @param fieldNames
 	 * @see QuerySearchObject#matchId(Object) 查询id的情况下用此方法 
 	 * @return
@@ -166,22 +173,20 @@ public class QuerySearchObject<T>{
 					predicateSteps.add(scope.predicate().bool().mustNot(scope.predicate().exists().field(field)));
 				}
 			} else {
-				if(list.size() > 0) {
-					if(value instanceof Collection) {
-						BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
-						for (Object v : ((Collection) value)) {
-							bool.should(scope.predicate().match().fields(fields).matching(v));
-						}
-						predicateSteps.add(bool);
-					} else if(value instanceof Object[]) {
-						BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
-						for (Object v : ((Object[]) value)) {
-							bool.should(scope.predicate().match().fields(fields).matching(v));
-						}
-						predicateSteps.add(bool);
-					} else {
-						predicateSteps.add(scope.predicate().match().fields(fields).matching(value));
+				if(value instanceof Collection) {
+					BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
+					for (Object v : ((Collection) value)) {
+						bool.should(scope.predicate().match().fields(fields).matching(v));
 					}
+					predicateSteps.add(bool);
+				} else if(value instanceof Object[]) {
+					BooleanPredicateClausesStep<?> bool = scope.predicate().bool();
+					for (Object v : ((Object[]) value)) {
+						bool.should(scope.predicate().match().fields(fields).matching(v));
+					}
+					predicateSteps.add(bool);
+				} else {
+					predicateSteps.add(scope.predicate().match().fields(fields).matching(value));
 				}
 			}
 		}
@@ -210,7 +215,10 @@ public class QuerySearchObject<T>{
 	}
 
 	/**
-	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这个一般是匹配单个字符，加上*号
+	 * 匹配，只要有一个字或一个词匹配上就能查到结果, 这个一般是匹配单个字符，加上*号，查not null可以用*，但过滤不了空数据
+	 * * matches zero, one or multiple characters.
+	 * ? matches zero or one character.
+	 * \ escape the following character, e.g. \? is interpreted as a literal ?, \\ as a literal \, etc.
 	 * @param value
 	 * @param fieldNames
 	 * @return

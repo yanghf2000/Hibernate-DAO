@@ -42,6 +42,12 @@
 		<property name="hibernate.search.backend.username">elastic</property>
 		<property name="hibernate.search.backend.password">123456</property>
 		<property name="hibernate.search.backend.analysis.configurer">com.github.yanghf2000.analyzer.ChineseAnalysisElasticsearchConfigurer</property>
+		<!-- hibernate search 6.1.0要加上此配置，否则起动报错
+			Validation of the existing index in the Elasticsearch cluster failed. See below for details.
+				attribute 'max_result_window':
+					failures:
+					  - Invalid value. Expected '10000', actual is '2147483647' -->
+		<property name="hibernate.search.backend.schema_management.settings_file">resources/index-settings.json</property>
 
     </session-factory>
 </hibernate-configuration>

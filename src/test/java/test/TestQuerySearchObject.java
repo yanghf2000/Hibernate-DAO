@@ -95,6 +95,21 @@ public class TestQuerySearchObject {
 	 * 查询指定字段
 	 */
 	@Test
+	public void testMatchNull3() {
+		// null值匹配
+//		List<User> list = userDao.getQuerySearchObject().match(null, "code").list();
+		// 对于使用GenericField注解，要全匹配才行，用match可以匹配null值，或全匹配
+//		List<User> list = userDao.getQuerySearchObject().match("a", "code").list();
+		// * 匹配0或多个，但不能匹配空串
+		List<User> list = userDao.getQuerySearchObject().wildcardMatch("*", "code").list();
+		System.out.println(list.size());
+		list.forEach(e -> System.out.println(e.getId() + " " + e.getName() + " -" + e.getCode() + "-"));
+	}
+
+	/**
+	 * 查询指定字段
+	 */
+	@Test
 	public void testMatch1() {
 		List<User> list = userDao.getQuerySearchObject().match("JHON", "name").list();
 		System.out.println(list.size());
@@ -250,6 +265,15 @@ public class TestQuerySearchObject {
 				.wildcardMatch("茅*台", "name").list(0, 20);
 		System.out.println(list.size());
 		list.forEach(p -> System.out.println(p.getName()));
+	}
+
+	@Test
+	public void testWildcardMatch2() {
+		//这种查找，对于有一个分词匹配不上，就获取不到结果
+		List<User> list = userDao.getQuerySearchObject()
+				.wildcardMatch("*", "code").list(0, 20);
+		System.out.println(list.size());
+		list.forEach(p -> System.out.println(p.getId() + " " + p.getName() + " -" + p.getCode() + "-"));
 	}
 
 	@Test
