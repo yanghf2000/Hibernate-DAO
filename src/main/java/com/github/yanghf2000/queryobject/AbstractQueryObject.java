@@ -1,9 +1,9 @@
 package com.github.yanghf2000.queryobject;
 
+import jakarta.persistence.criteria.*;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import javax.persistence.criteria.*;
 import java.util.*;
 
 
@@ -253,8 +253,9 @@ public abstract class AbstractQueryObject<O extends AbstractQueryObject, T>{
 	 * @return {@link AbstractQueryObject}
 	 */
 	public O orLike(String fieldName, String... values){
-		if(values == null || values.length < 1)
+		if(values == null || values.length < 1) {
 			throw new IllegalArgumentException("传入的参数不能为空!");
+		}
 		
 		Predicate[] pres = new Predicate[values.length];
 		for(int i = 0; i < values.length; i++) {

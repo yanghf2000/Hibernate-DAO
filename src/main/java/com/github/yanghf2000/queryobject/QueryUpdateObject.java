@@ -1,13 +1,10 @@
 package com.github.yanghf2000.queryobject;
 
-import java.util.Map;
-
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-
+import com.github.yanghf2000.dao.FieldsAndValuesMap;
+import jakarta.persistence.criteria.CriteriaUpdate;
 import org.hibernate.Session;
 
-import com.github.yanghf2000.dao.FieldsAndValuesMap;
+import java.util.Map;
 
 /**
  * 封装更新对象<p>
@@ -69,8 +66,8 @@ public class QueryUpdateObject<T> extends AbstractQueryObject<QueryUpdateObject<
 	}
 
 	/**
-	 * 获取CriteriaQuery
-	 * @return {@link CriteriaQuery}
+	 * 获取CriteriaUpdate
+	 * @return {@link CriteriaUpdate}
 	 */
 	private CriteriaUpdate<T> getCriteriaUpdate(){
 		this.criteria.where(getPredicate());

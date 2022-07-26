@@ -1,8 +1,8 @@
 package entity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 
 /**
  * 对于级联操作，若有单独的主键，则关联的对象不需要加@MapsId，否则生成的表不对<br>

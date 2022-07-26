@@ -4,7 +4,7 @@ import com.github.yanghf2000.queryobject.QueryDeleteObject;
 import com.github.yanghf2000.queryobject.QueryObject;
 import com.github.yanghf2000.queryobject.QuerySearchObject;
 import com.github.yanghf2000.queryobject.QueryUpdateObject;
-import org.apache.lucene.util.CollectionUtil;
+import jakarta.persistence.criteria.*;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,7 +13,6 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -57,7 +56,7 @@ public abstract class Dao<T> {
      */
     protected Session getSession(Integer timeout) {
         Session currentSession = getSessionFactory().getCurrentSession();
-        currentSession.setProperty("javax.persistence.query.timeout", timeout != null ? timeout : TIME_OUT);
+        currentSession.setProperty("jakarta.persistence.query.timeout", timeout != null ? timeout : TIME_OUT);
         currentSession.setProperty("hibernate.order_updates", true);
         currentSession.setProperty("hibernate.order_inserts", true);
         return currentSession;
@@ -70,7 +69,7 @@ public abstract class Dao<T> {
      */
     public Session getNewSession(Integer timeoutMillis) {
         Session openSession = getSessionFactory().openSession();
-        openSession.setProperty("javax.persistence.query.timeout", timeoutMillis != null ? timeoutMillis : TIME_OUT);
+        openSession.setProperty("jakarta.persistence.query.timeout", timeoutMillis != null ? timeoutMillis : TIME_OUT);
         return openSession;
     }
 
@@ -211,16 +210,27 @@ public abstract class Dao<T> {
      */
     @SuppressWarnings("rawtypes")
 	public int delete(String propertyName, Object value) {
-    	CriteriaBuilder builder = getSession().getCriteriaBuilder();
-    	CriteriaDelete<T> criteria = builder.createCriteriaDelete(clazz);
-    	Root<T> root = criteria.from(clazz);
-    	Path<Object> path = root.get(propertyName);
-    	
-    	if(value instanceof Collection) {
+        CriteriaBuilder builder = getSession().getCriteriaBuilder();
+        CriteriaDelete<T> criteria = builder.createCriteriaDelete(clazz);
+        Root<T> root = criteria.from(clazz);
+        Path<Object> path = root.get(propertyName);
+
+        if(value instanceof Collection) {
             criteria.where(path.in((Collection) value));
         } else {
             criteria.where(builder.equal(path, value));
         }
+
+        /*CriteriaBuilder builder = getSession().getCriteriaBuilder();
+    	CriteriaDelete<T> criteria = builder.createCriteriaDelete(clazz);
+    	Root<T> root = criteria.from(clazz);
+    	Path<Object> path = root.get(propertyName);
+
+    	if(value instanceof Collection) {
+            criteria.where(path.in((Collection) value));
+        } else {
+            criteria.where(builder.equal(path, value));
+        }*/
 
     	return getSession().createQuery(criteria).executeUpdate();
     }
@@ -246,7 +256,7 @@ public abstract class Dao<T> {
     // 改
     /**
      * 更新, 对于不存在的行，在执行提交时会报以下错误<p>
-     * javax.persistence.OptimisticLockException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1<br>
+     * jakarta.persistence.OptimisticLockException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1<br>
      * Caused by: org.hibernate.StaleStateException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1
      * @param t
      */
@@ -267,7 +277,7 @@ public abstract class Dao<T> {
 
     /**
      * 保存/更新, id为null时为保存，id不为空时为更新，但若id不为空，但不存在记录，在提交事务时会抛错：<br>
-     * javax.persistence.OptimisticLockException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1<br>
+     * jakarta.persistence.OptimisticLockException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1<br>
      * Caused by: org.hibernate.StaleStateException: Batch update returned unexpected row count from update [0]; actual row count: 0; expected: 1
      * @param t
      */
@@ -419,7 +429,14 @@ public abstract class Dao<T> {
     	CriteriaQuery<T> cq = builder.createQuery(clazz);
     	Root<T> root = cq.from(clazz);
     	cq.select(root);
-    	
+
+/*
+    	CriteriaBuilder builder = getSession().getCriteriaBuilder();
+    	CriteriaQuery<T> cq = builder.createQuery(clazz);
+    	Root<T> root = cq.from(clazz);
+    	cq.select(root);
+*/
+
     	return this.getSession().createQuery(cq).getResultList();
     }
     

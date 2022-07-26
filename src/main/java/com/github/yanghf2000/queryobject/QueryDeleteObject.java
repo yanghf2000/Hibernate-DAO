@@ -1,9 +1,8 @@
 package com.github.yanghf2000.queryobject;
 
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-
+import jakarta.persistence.criteria.CriteriaDelete;
 import org.hibernate.Session;
+
 
 /**
  * 封装更新对象<p>
@@ -32,8 +31,9 @@ public class QueryDeleteObject<T> extends AbstractQueryObject<QueryDeleteObject<
 	 * @return 删除成功的数量
 	 */
 	public int delete() {
-		if(andPres.isEmpty() && orPres.isEmpty())
+		if(andPres.isEmpty() && orPres.isEmpty()) {
 			throw new IllegalArgumentException("请为删除语句添加条件!");
+		}
 		
 		return this.session.createQuery(this.getCriteriaUpdate()).executeUpdate();
 	}

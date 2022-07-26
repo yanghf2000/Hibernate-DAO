@@ -1,6 +1,7 @@
 package entity;
 
-import javax.persistence.Entity;
+
+import jakarta.persistence.Entity;
 
 @Entity
 public class SimpleEntity extends BaseIdEntity{

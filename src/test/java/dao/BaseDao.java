@@ -43,7 +43,7 @@ public abstract class BaseDao<T extends BaseEntity> extends Dao<T> {
 		}
     	
 		session = getSessionFactory().openSession();
-		session.setProperty("javax.persistence.query.timeout", TIME_OUT);
+		session.setProperty("jakarta.persistence.query.timeout", TIME_OUT);
 		session.setProperty("hibernate.order_updates", true);
 		session.setProperty("hibernate.order_inserts", true);
 		

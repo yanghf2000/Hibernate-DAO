@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 
-import javax.persistence.AttributeNode;
-import javax.persistence.EntityGraph;
-import javax.persistence.Subgraph;
+import jakarta.persistence.AttributeNode;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.Subgraph;
 import java.util.*;
 
 /**

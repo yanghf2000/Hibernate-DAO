@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import util.SessionFactoryUtils;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;

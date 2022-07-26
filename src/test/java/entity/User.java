@@ -1,19 +1,17 @@
 package entity;
 
 import com.github.yanghf2000.analyzer.AnalyzerName;
+import com.github.yanghf2000.descriptor.CommaDelimitedListToStringsDescriptor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.Type;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 import vo.UserVo;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -119,11 +117,11 @@ public class User extends BaseIdEntity implements Comparable<User>{
 	
 	@GenericField
 	private LocalDateTime dateTime;
-	
-	@Type(type = "com.github.yanghf2000.descriptor.CommaDelimitedListToStringsDescriptor")
+
+	@Convert( converter = CommaDelimitedListToStringsDescriptor.class )
 	private List<String> jobs = new ArrayList<>();
 
-	@Type(type = "com.github.yanghf2000.descriptor.CommaDelimitedListToStringsDescriptor")
+	@Convert( converter = CommaDelimitedListToStringsDescriptor.class )
 	private List<Integer> interestingNumbers = new ArrayList<>();
 
 	// 对于以下想处理集合的，但没有独立类的，也是可以搜索的

@@ -3,7 +3,7 @@ package entity;
 import com.github.yanghf2000.analyzer.AnalyzerName;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

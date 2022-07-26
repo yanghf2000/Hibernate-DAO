@@ -1,12 +1,10 @@
 package test;
 
 import com.github.yanghf2000.dao.FieldsAndValuesMap;
-import dao.AddressDao;
-import dao.InterestingDao;
-import dao.ProductDao;
-import dao.UserDao;
+import dao.*;
 import entity.Address;
 import entity.Interesting;
+import entity.SimpleEntity;
 import entity.User;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
@@ -27,7 +25,8 @@ public class TestDao {
 	private AddressDao addressDao = new AddressDao();
 	private ProductDao productDao = new ProductDao();
 	private InterestingDao interestingDao = new InterestingDao();
-	
+	private SimpleEntityDao simpleEntityDao = new SimpleEntityDao();
+
 	private List<Session> sessions = new ArrayList<>();
 	
 	private Session ss;
@@ -36,11 +35,16 @@ public class TestDao {
 	private boolean commit = true;
 
 	@Test
+	public void prepare() throws InterruptedException {
+		System.out.println(userDao);
+	}
+
+	@Test
 	public void test() throws InterruptedException {
 		User user = userDao.get(1L);
 		System.out.println(user);
 	}
-	
+
 	@Before
 	public void before() {
 		sf = SessionFactoryUtils.build();
