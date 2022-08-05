@@ -369,7 +369,7 @@ public class QueryObject<T> extends AbstractQueryObject<QueryObject<T>, T> {
     /**
      * 取得一个集合，有分页
      * @param pageNo 起始页号, 从0开始
-     * @param size 要查询的数量, 若size为null, 则pageNo变为起始化
+     * @param size 要查询的数量, 若size为null, 则pageNo变为起始行
      * @return {@link List}
      */
     public <E>List<E> list(int pageNo, Integer size) {

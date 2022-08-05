@@ -362,7 +362,33 @@ public class TestQueryObject {
 															 .list();
 		System.out.println(list2.size());
 	}
-	
+
+	/**
+	 * 获取多个集合的错误：Caused by: org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags
+	 */
+	@Test
+	public void testInnerJoin1() {
+		// ************************** 报错 *************************
+		// 下面的语句无论queryObject还是hql都会报错
+		// Caused by: org.hibernate.loader.MultipleBagFetchException: cannot simultaneously fetch multiple bags:
+		// [entity.User.companies, entity.Company.addresses]
+		// 不能多次获取集合，如果把adresses改为address则没事
+		// 给addresses加上@OrderColumn可以好，不过会给数据表加一列
+		// alter table `company_address` add column `addresses_order` integer
+		// alter table `company_address` drop `company_id,address_id`;
+		// 也可以指定表中的主键或关联表的另一个字段，address_id，如：name = "id"，则不会再生成多余的字段了，
+		//如使用已存在的字段company_id，则会报生成重复字段的错
+		List<User> users = userDao.getQueryObject().leftJoinFetch("companies.addresses")
+				.andEqual("id", 1L).list();
+	}
+
+	@Test
+	public void testFindByHsql() {
+		String hql = "select u from User u left join fetch u.companies c left join fetch c.addresses where u.id = ?1";
+		List<User> users = userDao.findByHQL(hql, 1L);
+		System.out.println(users.size());
+	}
+
 	@Test
 	public void testLeftJoin() {
 		List<User> users = userDao.getQueryObject().leftJoin("addresses").distinct().andIn("id", new Long[]{1L, 2L}).list();

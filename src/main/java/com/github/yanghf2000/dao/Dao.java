@@ -337,7 +337,8 @@ public abstract class Dao<T> {
      */
     private void addParameters(Query query, boolean isNativeQuery, Object... args) {
         if (args != null && args.length > 0) {
-            int offset = isNativeQuery ? 1 : 0;
+            // hibernate6.1.1测的这里都是1才行，hql sql的参数也要从1开始，select u from User u where u.id = ?1
+            int offset = isNativeQuery ? 1 : 1;
             for (int i = 0; i < args.length; i++) {
                 Object value = args[i];
                 if (value instanceof Collection) {
