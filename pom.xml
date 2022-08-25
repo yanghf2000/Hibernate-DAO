@@ -9,7 +9,7 @@
         <java.version>11</java.version>
         <skipTests>true</skipTests>
         <hibernate.version>6.1.2.Final</hibernate.version>
-        <hibenate.search.version>6.1.5.Final</hibenate.search.version>
+        <hibenate.search.version>6.1.6.Final</hibenate.search.version>
         <apache.lucene.version>8.11.1</apache.lucene.version>
         <mysql.version>8.0.25</mysql.version>
         <c3p0.version>0.9.5.5</c3p0.version>
