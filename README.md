@@ -5,6 +5,9 @@ Hibernate通用DAO
 	在test文件夹下提供了测试方法，方便进行测试。
 	若有问题或建议可以联系我: yanghf2000@163.com
 
+2022-11-1
+hibernate 6.1.4, hibernate search 6.1.7
+
 2022-7-20
 使用Hibernate6.1
 javax.persistence要改为jakarta.persistence
