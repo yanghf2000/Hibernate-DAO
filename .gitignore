@@ -6,6 +6,7 @@
 /.mvn/
 /.springBeans
 /bin/
+/exe/
 /*.log
 /logs/
 /api/
