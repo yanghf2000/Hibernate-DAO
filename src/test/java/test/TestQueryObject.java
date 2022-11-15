@@ -191,7 +191,10 @@ public class TestQueryObject {
 	
 	@Test
 	public void testOrEqual() {
-		List<User> users = userDao.getQueryObject().orEqual("age", 88).orEqual("name", "ABCD").list();
+		List<User> users = userDao.getQueryObject()
+				.andEqual("id", 1).andEqual("code", "ABC")
+				.orEqual("age", 88).orEqual("name", "ABCD")
+				.list();
 		System.out.println(users.size());
 
 		List<Company> cs = companyDao.getQueryObject().orEqual("user.age", 88).list();

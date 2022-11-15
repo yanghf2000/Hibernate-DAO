@@ -48,13 +48,19 @@ public abstract class AbstractQueryObject<O extends AbstractQueryObject, T>{
 	}
 	
 	/**
-	 * 获取查询条件
+	 * 获取查询条件，所有的or条件放在一个and里面
+	 * List<User> users = userDao.getQueryObject()
+	 * 				.andEqual("id", 1).andEqual("code", "ABC")
+	 * 				.orEqual("age", 88).orEqual("name", "ABCD")
+	 * 				.list();
+	 *select u1_0.`*  from `user` u1_0 where u1_0.`id`=?  and u1_0.`code`=?
+	 *         and (u1_0.`age`=? or u1_0.`name`=?)
 	 * @return
 	 */
 	protected Predicate getPredicate() {
 		Predicate and = builder.and(andPres.toArray(new Predicate[andPres.size()]));
 		Predicate or = builder.or(orPres.toArray(new Predicate[orPres.size()]));
-		return builder.or(and, or);
+		return builder.and(and, or);
 	}
 	
 	// ********************************** 以下为添加条件 ********************************
