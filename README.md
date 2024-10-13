@@ -5,6 +5,8 @@ Hibernate通用DAO
 	在test文件夹下提供了测试方法，方便进行测试。
 	若有问题或建议可以联系我: yanghf2000@163.com
 
+2023-1-4
+
 2022-11-1
 hibernate 6.1.4, hibernate search 6.1.7
 
